@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "api/obfuscate.js": {
-      "maxDuration": 60
-    }
-  }
-}

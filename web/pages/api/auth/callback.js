@@ -114,34 +114,164 @@ export default async function handler(req, res) {
       );
     }
 
-    return sendResult(res, true, `ยืนยันตัวตนสำเร็จ! ยินดีต้อนรับ ${me.username}`);
+    return sendResult(res, true, "ยืนยันตัวตนสำเร็จ", me.username);
   } catch (err) {
     console.error("OAuth callback error:", err);
     return sendResult(res, false, "เกิดข้อผิดพลาดที่ไม่คาดคิด");
   }
 }
 
-function sendResult(res, success, message) {
+// ---------- หน้าผลลัพธ์ ----------
+// ดีไซน์แบบ "บัตรผ่านสมาชิก" มีเส้นปรุคั่นระหว่างส่วนตราประทับกับรายละเอียด
+function sendResult(res, success, message, username) {
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.status(200).send(`<!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${success ? "ยืนยันตัวตนสำเร็จ" : "ยืนยันตัวตนไม่สำเร็จ"}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  body { font-family: system-ui, sans-serif; background:#1e1f22; color:#fff;
-         height:100vh; margin:0; display:flex; align-items:center; justify-content:center; }
-  .card { background:#2b2d31; padding:40px; border-radius:12px; text-align:center; max-width:420px; }
-  .icon { font-size:48px; margin-bottom:12px; }
-  h1 { font-size:18px; margin:0 0 8px; }
-  p { color:#b5bac1; font-size:14px; }
+  :root {
+    --bg: #14141f;
+    --bg-glow: #1c1e3a;
+    --panel: #1c1e2b;
+    --panel-border: #2c2f42;
+    --text: #f2f1f7;
+    --text-dim: #9a9bb0;
+    --ok: #3ecf8e;
+    --ok-dim: #1f4d3c;
+    --fail: #ff6b6b;
+    --fail-dim: #4d2222;
+    --accent: #ffb454;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Noto Sans Thai", system-ui, sans-serif;
+    background:
+      radial-gradient(60% 50% at 50% 0%, var(--bg-glow) 0%, transparent 70%),
+      var(--bg);
+    color: var(--text);
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .pass {
+    width: 100%;
+    max-width: 380px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 20px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+    animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pass { animation: none; opacity: 1; transform: none; }
+  }
+  @keyframes rise {
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .pass-top {
+    padding: 40px 32px 28px;
+    text-align: center;
+  }
+  .seal {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: ${success ? "var(--ok-dim)" : "var(--fail-dim)"};
+    border: 2px solid ${success ? "var(--ok)" : "var(--fail)"};
+  }
+  .seal svg { width: 28px; height: 28px; }
+  h1 {
+    font-size: 19px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    letter-spacing: 0.01em;
+  }
+  p.message {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    margin: 0;
+  }
+  .perforation {
+    position: relative;
+    height: 0;
+    border-top: 1.5px dashed var(--panel-border);
+    margin: 0 24px;
+  }
+  .perforation::before, .perforation::after {
+    content: "";
+    position: absolute;
+    top: -10px;
+    width: 20px;
+    height: 20px;
+    background: var(--bg);
+    border-radius: 50%;
+  }
+  .perforation::before { left: -34px; }
+  .perforation::after { right: -34px; }
+  .pass-bottom {
+    padding: 24px 32px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .pass-bottom .value {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    background: ${success ? "var(--ok-dim)" : "var(--fail-dim)"};
+    color: ${success ? "var(--ok)" : "var(--fail)"};
+  }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor;
+  }
 </style>
 </head>
 <body>
-  <div class="card">
-    <div class="icon">${success ? "✅" : "❌"}</div>
-    <h1>${success ? "ยืนยันตัวตนสำเร็จ" : "ยืนยันตัวตนไม่สำเร็จ"}</h1>
-    <p>${escapeHtml(message)}</p>
+  <div class="pass">
+    <div class="pass-top">
+      <div class="seal">
+        ${success
+          ? `<svg viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+          : `<svg viewBox="0 0 24 24" fill="none" stroke="var(--fail)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`
+        }
+      </div>
+      <h1>${success ? "ยืนยันตัวตนสำเร็จ" : "ยืนยันตัวตนไม่สำเร็จ"}</h1>
+      <p class="message">${escapeHtml(message)}</p>
+    </div>
+    <div class="perforation"></div>
+    <div class="pass-bottom">
+      <span class="label">${username ? `บัญชี ${escapeHtml(username)}` : "สถานะ"}</span>
+      <span class="status-tag"><span class="dot"></span>${success ? "ผ่านการยืนยัน" : "ไม่ผ่าน"}</span>
+    </div>
   </div>
 </body>
 </html>`);

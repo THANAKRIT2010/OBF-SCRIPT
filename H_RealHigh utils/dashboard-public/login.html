@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flexozy — เข้าสู่ระบบ</title>
+<link rel="stylesheet" href="/dashboard.css">
+<style>
+    body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-image:
+            linear-gradient(var(--hairline) 1px, transparent 1px),
+            linear-gradient(90deg, var(--hairline) 1px, transparent 1px);
+        background-size: 48px 48px;
+        background-position: center;
+    }
+
+    .panel {
+        width: 360px;
+        background: var(--surface);
+        border: 1px solid var(--hairline);
+        padding: 36px 32px;
+    }
+
+    .mark {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 28px;
+    }
+    .mark .dot {
+        width: 8px;
+        height: 8px;
+        background: var(--accent);
+    }
+    .mark span {
+        font-size: 13px;
+        letter-spacing: 0.02em;
+        color: var(--text-muted);
+    }
+
+    h1 {
+        font-size: 22px;
+        font-weight: 600;
+        margin: 0 0 6px;
+    }
+    p.lede {
+        color: var(--text-muted);
+        font-size: 13.5px;
+        margin: 0 0 28px;
+    }
+
+    label {
+        display: block;
+        font-size: 12.5px;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+    }
+    input[type="password"] {
+        width: 100%;
+        background: var(--bg);
+        border: 1px solid var(--hairline);
+        color: var(--text);
+        padding: 11px 12px;
+        font-size: 14px;
+        margin-bottom: 18px;
+    }
+    input[type="password"]:focus { border-color: var(--accent); }
+
+    button.submit {
+        width: 100%;
+        background: var(--accent);
+        border: none;
+        color: #1a1206;
+        font-weight: 600;
+        font-size: 14px;
+        padding: 12px;
+        font-family: 'Sora', sans-serif;
+    }
+    button.submit:hover { background: var(--accent-hover); }
+
+    .err {
+        color: var(--danger);
+        font-size: 13px;
+        margin-top: 14px;
+        min-height: 16px;
+    }
+</style>
+</head>
+<body>
+    <form class="panel" id="loginForm">
+        <div class="mark"><div class="dot"></div><span>FLEXOZY CONSOLE</span></div>
+        <h1>เข้าสู่ระบบ</h1>
+        <p class="lede">กรอกรหัสผ่านแอดมินเพื่อเข้าดูสถานะและตั้งค่าระบบ</p>
+        <label for="password">รหัสผ่าน</label>
+        <input type="password" id="password" autofocus required>
+        <button class="submit" type="submit">เข้าสู่ระบบ</button>
+        <div class="err" id="errBox"></div>
+    </form>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+            const errBox = document.getElementById('errBox');
+            errBox.textContent = '';
+            try {
+                const r = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                const data = await r.json();
+                if (r.ok) window.location.href = '/';
+                else errBox.textContent = data.error || 'เข้าสู่ระบบไม่สำเร็จ';
+            } catch (err) {
+                errBox.textContent = 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้';
+            }
+        });
+    </script>
+</body>
+</html>

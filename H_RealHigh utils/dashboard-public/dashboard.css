@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+    --bg: #0b0f14;
+    --surface: #12181f;
+    --surface-alt: #171f29;
+    --hairline: #232b36;
+    --text: #e7ecf2;
+    --text-muted: #7c8896;
+    --text-faint: #4d5866;
+    --accent: #e8a33d;
+    --accent-hover: #f2b457;
+    --accent-dim: rgba(232, 163, 61, 0.12);
+    --success: #35d0a0;
+    --success-dim: rgba(53, 208, 160, 0.12);
+    --danger: #e5636b;
+    --danger-dim: rgba(229, 99, 107, 0.12);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+.mono {
+    font-family: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+}
+
+a { color: inherit; }
+
+::selection { background: var(--accent-dim); }
+
+/* focus visibility */
+button:focus-visible, input:focus-visible, a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+input {
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

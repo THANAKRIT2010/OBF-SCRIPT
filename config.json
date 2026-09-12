@@ -1,0 +1,10 @@
+{
+    "BOT_TOKEN": "โทเคนบอท",
+    "AdminCommand": [
+        "1429501061877469304"
+    ],
+    "QUEST_API_KEY": "เปลี่ยนเป็นคีย์สุ่มยาวๆ ก่อนใช้งานจริง",
+    "QUEST_API_PORT": 3940,
+    "DASHBOARD_PASSWORD": "เปลี่ยนรหัสผ่านนี้ก่อนใช้งานจริง",
+    "DASHBOARD_PORT": 3939
+}

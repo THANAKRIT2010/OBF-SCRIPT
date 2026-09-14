@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Flexozy</title>
+<link rel="icon" type="image/png" href="/images/flexozy-logo.png">
+<link rel="shortcut icon" type="image/png" href="/images/flexozy-logo.png">
+<link rel="apple-touch-icon" href="/images/flexozy-logo.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="/notify-standalone.js"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          ink: { 950:'#04050A', 900:'#0A0C16', 800:'#131625' },
+          panel: { DEFAULT:'#0E1120', soft:'#171B2E' },
+          line: { DEFAULT:'#252A42', soft:'#1C2036' },
+          cyan: { DEFAULT:'#818CF8', soft:'#1E1B3D' },
+          gold: { DEFAULT:'#F59E0B', soft:'#2E2308' },
+          danger: { DEFAULT:'#F87171', soft:'#2E1414' }
+        },
+        fontFamily: { plex: ['"IBM Plex Sans Thai"','sans-serif'], mono: ['"JetBrains Mono"','monospace'] }
+      }
+    }
+  }
+</script>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body class="min-h-screen flex flex-col">
+
+<!-- พื้นหลังทั้งเว็บ: ไล่เฉดสี + แสงเรือง (glow) โทนน้ำเงิน-ม่วงตามแบรนด์ Flexozy -->
+<div class="app-bg-fx" aria-hidden="true">
+  <span class="bg-orb bg-orb-1"></span>
+  <span class="bg-orb bg-orb-2"></span>
+  <span class="bg-orb bg-orb-3"></span>
+</div>
+
+<!-- Top nav -->
+<nav class="bg-white/95 backdrop-blur-md border-b border-line sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 relative">
+    <a href="/scripts" class="flex items-center gap-2.5 shrink-0">
+      <div class="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden bg-[#05070D] ring-1 ring-cyan/40 shadow-[0_0_14px_-2px_rgba(99,102,241,.6)]"><img src="/images/flexozy-logo.png" alt="Flexozy" class="w-full h-full object-contain p-0.5"></div>
+      <div class="leading-tight">
+        <span id="brandName" class="text-base sm:text-lg font-bold eyebrow tracking-wide text-slate-900">FLEXOZY</span>
+        <span id="brandTagline" class="text-[9px] block text-slate-400 eyebrow tracking-wider">ROBLOX SCRIPT HUB</span>
+      </div>
+    </a>
+
+    <div class="flex items-center gap-2 shrink-0">
+      <button onclick="toggleNavMenu()" id="navMenuBtn" class="btn-ghost w-10 h-10 rounded-xl flex items-center justify-center relative">
+        <i class="fa-solid fa-bars text-sm"></i>
+      </button>
+      <button onclick="quickTopup()" class="btn-cyan flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-semibold text-xs">
+        <i class="fa-solid fa-wallet text-xs"></i><span class="hidden sm:inline">เติมเงิน</span>
+      </button>
+      <div id="authContainer">
+        <button onclick="loginWithDiscord()" class="btn-ghost flex items-center gap-2 px-3 py-2 rounded-xl font-semibold text-xs">
+          <i class="fa-solid fa-user text-sm"></i><span class="hidden sm:inline">เข้าสู่ระบบ</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- เมนูลัดแบบ dropdown — รวมทุกหน้าไว้ที่นี่ที่เดียว กดปุ่ม ☰ เพื่อเปิด/ปิด -->
+    <div id="navMenuDropdown" class="hidden absolute top-[calc(100%+8px)] right-4 sm:right-6 lg:right-8 w-60 panel-card p-2 shadow-2xl z-50">
+      <a href="/scripts" data-tab="scripts" onclick="closeNavMenu()" class="nav-menu-item"><i class="fa-solid fa-folder-open w-5 text-cyan"></i>สคริปต์</a>
+      <a href="/store" data-tab="store" onclick="closeNavMenu()" class="nav-menu-item"><i class="fa-solid fa-store w-5 text-cyan"></i>ร้านค้า</a>
+      <button onclick="redeemCodePrompt();closeNavMenu()" class="nav-menu-item w-full text-left"><i class="fa-solid fa-ticket w-5 text-cyan"></i>แลกโค้ด</button>
+      <a href="/vault" data-tab="vault" onclick="closeNavMenu()" class="nav-menu-item"><i class="fa-solid fa-lock w-5 text-cyan"></i>ฝากสคริปต์</a>
+      <a href="/roblox" data-tab="roblox" onclick="closeNavMenu()" class="nav-menu-item"><i class="fa-brands fa-google-play w-5 text-cyan"></i>Roblox ID</a>
+      <a href="/team" data-tab="team" onclick="closeNavMenu()" class="nav-menu-item"><i class="fa-solid fa-user-group w-5 text-cyan"></i>ทีมงาน</a>
+      <a href="/partners" data-tab="partners" onclick="closeNavMenu()" class="nav-menu-item"><i class="fa-solid fa-handshake w-5 text-cyan"></i>พาร์ทเนอร์</a>
+      <a href="/admin" id="adminNavBtn" data-tab="admin" onclick="closeNavMenu()" class="nav-menu-item hidden"><i class="fa-solid fa-shield-halved w-5 text-cyan"></i>Admin</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ป้ายประกาศแบบเลื่อน — ซ่อนอัตโนมัติถ้าแอดมินไม่ได้ตั้งข้อความไว้ (ย้ายไปแสดงในหน้า hero แทนแบบ sticky ด้านล่าง) -->
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+  <!-- ================= SCRIPTS ================= -->
+  <section data-view="scripts" class="active">
+
+    <!-- Hero banner — ใช้รูปที่ลูกค้าเตรียมมาเอง (แทนกล่องไล่สี+มาสคอต SVG เดิม) -->
+    <div class="relative overflow-hidden rounded-2xl mb-4 max-w-5xl mx-auto">
+      <img src="/images/hero-banner.png" alt="Flexozy — แจก ID Song &amp; Script Roblox" class="w-full h-auto block">
+    </div>
+
+    <!-- เมนูลัด 4 อัน — การ์ดแยกแต่ละใบ มีระยะห่างชัดเจน ไม่ใช่กล่องเดียวแบ่งช่อง -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 max-w-5xl mx-auto mb-2.5">
+      <a href="/scripts" class="panel-card rounded-2xl flex items-center justify-between gap-2 px-4 py-3.5">
+        <div class="flex items-center gap-2.5 min-w-0"><i class="fa-solid fa-folder-open text-cyan"></i><div class="min-w-0"><span class="block text-xs font-semibold text-slate-900 truncate">สคริปต์ทั้งหมด</span><span class="block text-[9.5px] text-slate-400">เลือกสคริปต์ที่ต้องการ</span></div></div>
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-400 shrink-0"></i>
+      </a>
+      <a href="/vault" class="panel-card rounded-2xl flex items-center justify-between gap-2 px-4 py-3.5">
+        <div class="flex items-center gap-2.5 min-w-0"><i class="fa-solid fa-lock text-cyan"></i><div class="min-w-0"><span class="block text-xs font-semibold text-slate-900 truncate">Vault ส่วนตัว</span><span class="block text-[9.5px] text-slate-400">เก็บโค้ดอย่างปลอดภัย</span></div></div>
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-400 shrink-0"></i>
+      </a>
+      <a href="/roblox" class="panel-card rounded-2xl flex items-center justify-between gap-2 px-4 py-3.5">
+        <div class="flex items-center gap-2.5 min-w-0"><i class="fa-brands fa-google-play text-cyan"></i><div class="min-w-0"><span class="block text-xs font-semibold text-slate-900 truncate">Roblox ID</span><span class="block text-[9.5px] text-slate-400">ค้นหาเสียง/ไอเทม</span></div></div>
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-400 shrink-0"></i>
+      </a>
+      <a href="/team" class="panel-card rounded-2xl flex items-center justify-between gap-2 px-4 py-3.5">
+        <div class="flex items-center gap-2.5 min-w-0"><i class="fa-solid fa-user-group text-cyan"></i><div class="min-w-0"><span class="block text-xs font-semibold text-slate-900 truncate">ทีมงาน</span><span class="block text-[9.5px] text-slate-400">ติดต่อทีมงาน</span></div></div>
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-400 shrink-0"></i>
+      </a>
+    </div>
+
+    <!-- สถิติ 4 อัน — การ์ดแยกแต่ละใบเช่นกัน -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 max-w-5xl mx-auto mb-4">
+      <div class="panel-card rounded-2xl flex items-center gap-2.5 px-4 py-3.5">
+        <div class="w-8 h-8 rounded-lg bg-blue-50 text-cyan flex items-center justify-center shrink-0"><i class="fa-solid fa-users text-xs"></i></div>
+        <div><span class="eyebrow text-[9px] text-slate-400 block uppercase">กำลังออนไลน์</span><span id="statOnline" class="text-base font-bold text-slate-900 eyebrow">1</span></div>
+      </div>
+      <div class="panel-card rounded-2xl flex items-center gap-2.5 px-4 py-3.5">
+        <div class="w-8 h-8 rounded-lg bg-blue-50 text-cyan flex items-center justify-center shrink-0"><i class="fa-solid fa-eye text-xs"></i></div>
+        <div><span class="eyebrow text-[9px] text-slate-400 block uppercase">ยอดเข้าชม</span><span id="statViews" class="text-base font-bold text-slate-900 eyebrow">0</span></div>
+      </div>
+      <div class="panel-card rounded-2xl flex items-center gap-2.5 px-4 py-3.5">
+        <div class="w-8 h-8 rounded-lg bg-blue-50 text-cyan flex items-center justify-center shrink-0"><i class="fa-solid fa-scroll text-xs"></i></div>
+        <div><span class="eyebrow text-[9px] text-slate-400 block uppercase">สคริปต์ทั้งหมด</span><span id="statScripts" class="text-base font-bold text-slate-900 eyebrow">0</span></div>
+      </div>
+      <div class="panel-card rounded-2xl flex items-center gap-2.5 px-4 py-3.5">
+        <div class="w-8 h-8 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-check text-xs"></i></div>
+        <div><span class="eyebrow text-[9px] text-slate-400 block uppercase">ระบบ</span><span class="text-base font-bold text-green-400 eyebrow">ออนไลน์</span></div>
+      </div>
+    </div>
+
+    <!-- ป้ายประกาศ — การ์ดแยกรูปแบบเดียวกับกล่องด้านบน มีป้าย "ประกาศ" ลอยซ้าย + ข้อความเลื่อนขวา -->
+    <div id="announceTicker" class="hidden panel-card rounded-2xl max-w-5xl mx-auto mb-4 pl-2 pr-4 py-2 flex items-center gap-3 overflow-hidden">
+      <span class="shrink-0 inline-flex items-center gap-1.5 bg-slate-100 text-slate-900 text-[10.5px] font-semibold px-3 py-1.5 rounded-xl"><i class="fa-solid fa-bell text-cyan"></i>ประกาศ</span>
+      <div class="flex-1 min-w-0 overflow-hidden">
+        <div class="ticker-track flex items-center">
+          <div id="announceTickerText" class="flex shrink-0 text-[11px] text-slate-500"></div>
+          <div id="announceTickerText2" class="flex shrink-0 text-[11px] text-slate-500" aria-hidden="true"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-2.5 max-w-2xl mx-auto mb-6">
+      <div class="relative flex-1">
+        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400"><i class="fa-solid fa-magnifying-glass text-xs"></i></div>
+        <input type="text" id="searchInput" placeholder="ค้นหาชื่อเกม, ชื่อสคริปต์ หรือผู้พัฒนา..." class="input-dark w-full pl-10 pr-4 py-3 rounded-xl text-xs">
+      </div>
+      <button id="addScriptBtn" onclick="openScriptModal()" class="hidden btn-cyan items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-semibold text-xs shrink-0">
+        <i class="fa-solid fa-plus"></i><span>แจกสคริปต์</span>
+      </button>
+    </div>
+
+    <div id="categoriesSection" class="max-w-5xl mx-auto mb-8 hidden">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <span class="eyebrow text-[9px] text-slate-400 block uppercase mb-0.5">Flexozy</span>
+          <h2 class="text-base font-bold text-slate-900">หมวดหมู่สินค้า</h2>
+        </div>
+        <a href="/scripts" class="text-xs font-semibold text-cyan flex items-center gap-1 hover:opacity-70">ดูทั้งหมด <i class="fa-solid fa-arrow-right text-[10px]"></i></a>
+      </div>
+      <div id="categoriesGrid" class="grid grid-cols-2 gap-3.5 sm:gap-4"></div>
+    </div>
+
+    <div class="max-w-5xl mx-auto mb-3 flex items-center justify-between">
+      <span class="text-sm font-bold text-slate-900"><i class="fa-solid fa-star text-gold mr-1.5"></i>สคริปต์แนะนำ</span>
+    </div>
+    <div id="scriptGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 max-w-5xl mx-auto"></div>
+  </section>
+
+  <!-- ================= STORE ================= -->
+  <section data-view="store">
+    <div class="max-w-5xl mx-auto">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <div>
+          <span class="eyebrow text-[9px] text-slate-400 block uppercase mb-0.5">Flexozy</span>
+          <h2 class="text-xl font-bold text-slate-900"><i class="fa-solid fa-store text-cyan mr-1.5"></i>ร้านค้า</h2>
+        </div>
+        <div id="walletBox" class="hidden panel-card rounded-xl px-4 py-2.5 flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-cyan flex items-center justify-center"><i class="fa-solid fa-wallet text-xs"></i></div>
+          <div><span class="eyebrow text-[9px] text-slate-400 block uppercase">ยอดเงินคงเหลือ</span><span id="walletBalance" class="text-sm font-bold text-slate-900 eyebrow">0 บาท</span></div>
+          <button onclick="openTopupModal()" class="btn-cyan px-3 py-1.5 rounded-lg text-[11px] font-semibold ml-1"><i class="fa-solid fa-plus mr-1"></i>เติมเงิน</button>
+        </div>
+      </div>
+
+      <div id="storeLoginPrompt" class="hidden panel-card rounded-xl p-4 mb-5 text-center text-xs text-slate-500">
+        <i class="fa-solid fa-circle-info text-cyan mr-1"></i>เข้าสู่ระบบก่อนเพื่อเติมเงินและสั่งซื้อสินค้า
+      </div>
+
+      <button id="addProductBtn" onclick="openProductModal()" class="hidden btn-cyan items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-semibold text-xs mb-5">
+        <i class="fa-solid fa-plus"></i><span>เพิ่มสินค้า</span>
+      </button>
+
+      <div id="storeGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5"></div>
+    </div>
+  </section>
+
+  <!-- ================= VAULT ================= -->
+  <section data-view="vault">
+    <div class="text-center max-w-xl mx-auto mb-6">
+      <div class="w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center" style="background:linear-gradient(135deg,#6366F1,#818CF8); box-shadow:0 10px 24px -8px rgba(79,70,229,.5)">
+        <i class="fa-solid fa-lock text-white text-lg"></i>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mb-1.5">ฝากสคริปต์เป็นลิงก์ส่วนตัว</h2>
+      <p class="text-xs text-slate-500">วางโค้ดของคุณ แปลงเป็นลิงก์ของ Flexozy ตั้งรหัสผ่านได้ ป้องกันคนไม่รู้จักคัดลอกโค้ดออกไปใช้</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 max-w-4xl mx-auto">
+      <div class="panel-card rounded-2xl p-5">
+        <h3 class="text-sm font-bold text-slate-900 mb-3"><i class="fa-solid fa-plus text-cyan mr-1.5"></i>สร้างลิงก์ใหม่</h3>
+        <form id="vaultForm" onsubmit="submitVault(event)" class="space-y-3">
+          <div><label class="block text-[11px] text-slate-500 mb-1">ชื่อลิงก์ (ไม่บังคับ)</label><input type="text" id="vaultTitle" class="input-dark w-full rounded-xl px-3.5 py-2 text-xs" placeholder="เช่น Script บิน Blox Fruits"></div>
+          <div>
+            <label class="block text-[11px] text-slate-500 mb-1">รูปปก (ไม่บังคับ)</label>
+            <div class="upload-drop">
+              <img id="vaultImagePreview" class="upload-preview" src="https://placehold.co/80x80/EFF6FF/93C5FD?text=IMG">
+              <div class="flex-1 min-w-0">
+                <label class="upload-drop-btn"><i class="fa-solid fa-upload mr-1"></i>แนบรูปจากเครื่อง<input type="file" accept="image/*" onchange="uploadAndFill(this,'vaultImage','vaultImagePreview')"></label>
+                <input id="vaultImage" placeholder="หรือวางลิงก์รูปภาพ" class="input-dark w-full rounded-lg px-3 py-1.5 text-[11px] mt-1.5" oninput="document.getElementById('vaultImagePreview').src=this.value||'https://placehold.co/80x80/EFF6FF/93C5FD?text=IMG'">
+              </div>
+            </div>
+          </div>
+          <div><label class="block text-[11px] text-slate-500 mb-1 flex items-center justify-between"><span>วางโค้ดของคุณ *</span><span class="text-[9px] text-slate-400 eyebrow"><i class="fa-solid fa-palette mr-0.5"></i>ไฮไลต์สีอัตโนมัติ</span></label><textarea id="vaultScript" required rows="8" class="code-area w-full rounded-xl p-3 text-xs" placeholder="-- วางโค้ด Lua ที่นี่ ระบบจะเปลี่ยนสีให้อัตโนมัติ"></textarea></div>
+          <div><label class="block text-[11px] text-slate-500 mb-1"><i class="fa-solid fa-key text-[10px] mr-1"></i>ตั้งรหัสผ่าน (ไม่บังคับ)</label><input type="text" id="vaultPassword" class="input-dark w-full rounded-xl px-3.5 py-2 text-xs" placeholder="เว้นว่าง = ใครก็เปิดได้ทันที"></div>
+          <button type="submit" class="btn-cyan w-full py-2.5 rounded-xl font-semibold text-xs"><i class="fa-solid fa-link mr-1.5"></i>แปลงเป็นลิงก์</button>
+        </form>
+        <div id="vaultResult" class="hidden mt-4 p-4 rounded-xl" style="background:linear-gradient(135deg,#EFF6FF,#F0FDFA); border:1px solid #BFDBFE;">
+          <p class="text-[11px] text-cyan mb-1.5 eyebrow"><i class="fa-solid fa-circle-check mr-1"></i>สร้างลิงก์สำเร็จ</p>
+          <div class="flex gap-2">
+            <input id="vaultResultLink" readonly class="input-dark flex-1 rounded-lg px-3 py-2 text-[11px] eyebrow">
+            <button onclick="copyVaultResult()" class="btn-ghost px-3 rounded-lg text-xs bg-white"><i class="fa-regular fa-copy"></i></button>
+          </div>
+          <p id="vaultResultHint" class="hidden text-[10px] text-slate-500 mt-2 leading-relaxed"></p>
+        </div>
+      </div>
+
+      <div class="panel-card rounded-2xl p-5">
+        <h3 class="text-sm font-bold text-slate-900 mb-3"><i class="fa-solid fa-list text-cyan mr-1.5"></i>ลิงก์ของฉัน</h3>
+        <div id="myVaultList" class="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+          <p class="text-xs text-slate-400 text-center py-8">เข้าสู่ระบบเพื่อดูลิงก์ของคุณ</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="vaultUnlockWrap" class="hidden max-w-lg mx-auto mt-8">
+      <div class="panel-card rounded-2xl p-5">
+        <h3 class="text-sm font-bold text-slate-900 mb-1"><i class="fa-solid fa-unlock text-cyan mr-1.5"></i>เปิดลิงก์</h3>
+        <p id="vaultUnlockTitle" class="text-xs text-slate-500 mb-3"></p>
+        <div id="vaultPasswordWrap" class="hidden">
+          <input type="text" id="vaultUnlockPassword" class="input-dark w-full rounded-xl px-3.5 py-2 text-xs mb-2.5" placeholder="ใส่รหัสผ่านลิงก์นี้">
+          <button onclick="submitUnlock()" class="btn-cyan w-full py-2.5 rounded-xl font-semibold text-xs">ปลดล็อก</button>
+        </div>
+        <div id="vaultUnlockedWrap" class="hidden">
+          <pre id="vaultUnlockedScript" class="lua-code w-full rounded-xl p-3 text-xs mb-2.5" style="max-height:260px;"></pre>
+          <button onclick="copyUnlockedScript()" class="btn-ghost w-full py-2 rounded-xl text-xs"><i class="fa-regular fa-copy mr-1"></i>คัดลอกโค้ด</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ROBLOX ID ================= -->
+  <section data-view="roblox">
+    <div class="text-center max-w-xl mx-auto mb-6">
+      <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mb-1.5"><i class="fa-brands fa-google-play text-cyan mr-1.5"></i>เช็ค Roblox Sound ID</h2>
+      <p class="text-xs text-slate-500">ใส่ ID หรือวางลิงก์เพลงจาก Roblox เพื่อตรวจสอบและฟังตัวอย่าง</p>
+    </div>
+
+    <div class="max-w-lg mx-auto flex gap-2 mb-6">
+      <input type="text" id="robloxIdInput" class="input-dark flex-1 rounded-xl px-3.5 py-2.5 text-xs" placeholder="เช่น 1837443492 หรือ https://www.roblox.com/library/...">
+      <button onclick="checkRobloxId()" class="btn-cyan px-4 rounded-xl text-xs font-semibold shrink-0">เช็ค</button>
+    </div>
+
+    <div id="robloxResult" class="hidden max-w-lg mx-auto mb-8"></div>
+
+    <div id="robloxGenresSection" class="max-w-5xl mx-auto mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-bold text-slate-900"><i class="fa-solid fa-grip text-cyan mr-1.5"></i>หมวดหมู่เพลง</h3>
+      </div>
+      <div id="robloxGenresGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+    </div>
+
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+      <div class="flex items-center gap-2">
+        <div class="flex gap-1.5 bg-slate-100 rounded-lg p-1">
+          <button onclick="switchRobloxTab('catalog')" data-rtab="catalog" class="rtab-btn active px-3 py-1.5 rounded-md text-xs font-medium"><i class="fa-solid fa-record-vinyl mr-1"></i>คลังทั้งหมด</button>
+          <button onclick="switchRobloxTab('favorites')" data-rtab="favorites" class="rtab-btn px-3 py-1.5 rounded-md text-xs font-medium"><i class="fa-solid fa-star mr-1"></i>รายการโปรด</button>
+        </div>
+        <button id="robloxGenreBackBtn" onclick="clearRobloxGenreFilter()" class="hidden btn-ghost text-[11px] px-3 py-1.5 rounded-lg"><i class="fa-solid fa-arrow-left mr-1"></i><span id="robloxGenreBackLabel"></span></button>
+      </div>
+      <input type="text" id="robloxSearchInput" oninput="renderRobloxCatalog()" placeholder="ค้นหาชื่อเพลง..." class="input-dark rounded-xl px-3.5 py-2 text-xs w-full sm:w-56">
+    </div>
+    <div id="robloxCatalogGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5"></div>
+    <div id="robloxFavoritesGrid" class="hidden grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5"></div>
+  </section>
+
+  <!-- ================= TEAM ================= -->
+  <section data-view="team">
+    <div class="text-center max-w-xl mx-auto mb-6">
+      <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mb-1.5"><i class="fa-solid fa-user-group text-cyan mr-1.5"></i>ทีมงาน Flexozy</h2>
+      <p class="text-xs text-slate-500">รายชื่อทีมงานและแอดมินทั้งหมดของเว็บนี้</p>
+    </div>
+    <div id="teamGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto"></div>
+  </section>
+
+  <!-- ================= PARTNERS ================= -->
+  <section data-view="partners">
+    <div class="text-center max-w-xl mx-auto mb-6">
+      <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mb-1.5"><i class="fa-solid fa-handshake text-cyan mr-1.5"></i>พาร์ทเนอร์ผู้สนับสนุน</h2>
+    </div>
+    <div id="partnerGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+  </section>
+
+  <!-- ================= ADMIN ================= -->
+  <section data-view="admin">
+    <div id="adminDenied" class="hidden text-center py-24">
+      <i class="fa-solid fa-lock text-3xl text-slate-300 mb-3"></i>
+      <p class="text-sm text-slate-500">หน้านี้สำหรับแอดมินเท่านั้น</p>
+    </div>
+
+    <div id="adminPanel" class="hidden">
+      <div class="flex items-center gap-1.5 mb-5 flex-wrap">
+        <span class="role-badge mr-2"><i class="fa-solid fa-shield-halved mr-1"></i>ADMIN PANEL</span>
+      </div>
+
+      <!-- มือถือ: ใช้ dropdown เลือกเมนูแทนแถบเมนูด้านข้าง -->
+      <div class="md:hidden mb-4">
+        <select id="adminMobileNav" onchange="navigate('/admin/'+this.value)" class="input-dark w-full rounded-xl px-3.5 py-2.5 text-xs eyebrow">
+          <optgroup label="ภาพรวม"><option value="overview">ภาพรวม</option></optgroup>
+          <optgroup label="เนื้อหา">
+            <option value="scripts">สคริปต์</option>
+            <option value="categories">หมวดหมู่</option>
+            <option value="vault">Vault</option>
+            <option value="roblox">Roblox ID</option>
+            <option value="partners">พาร์ทเนอร์</option>
+          </optgroup>
+          <optgroup label="ผู้ใช้งาน">
+            <option value="members">สมาชิก</option>
+            <option value="team">ทีมงาน</option>
+            <option value="moderation">รายงาน/แบน</option>
+          </optgroup>
+          <optgroup label="การเงิน">
+            <option value="store">ร้านค้า</option>
+            <option value="redeem">โค้ดแลกรางวัล</option>
+            <option value="apikeys">API Key เช็คสลิป</option>
+          </optgroup>
+          <optgroup label="ระบบ/ตั้งค่า">
+            <option value="settings">ตั้งค่าเว็บ</option>
+            <option value="loading">หน้าโหลดเว็บ</option>
+            <option value="popup">ป็อปอัพต้อนรับ</option>
+            <option value="maintenance">ปิดปรับปรุง</option>
+            <option value="webhooks">แจ้งเตือน</option>
+            <option value="audit">Audit Log</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="flex gap-5 items-start">
+        <!-- เมนูด้านข้าง (desktop/tablet) -->
+        <aside class="admin-sidebar panel-card rounded-2xl p-2.5 w-56 shrink-0 hidden md:block">
+          <nav class="flex flex-col gap-0.5">
+            <span class="admin-side-group-label">ภาพรวม</span>
+            <button onclick="navigate('/admin/overview')" class="admin-subtab admin-side-link" data-sub="overview" data-perm=""><i class="fa-solid fa-gauge-high"></i>ภาพรวม</button>
+
+            <span class="admin-side-group-label">เนื้อหา</span>
+            <button onclick="navigate('/admin/scripts')" class="admin-subtab admin-side-link" data-sub="scripts" data-perm="scripts"><i class="fa-solid fa-file-code"></i>สคริปต์</button>
+            <button onclick="navigate('/admin/categories')" class="admin-subtab admin-side-link" data-sub="categories" data-perm="categories"><i class="fa-solid fa-grip"></i>หมวดหมู่</button>
+            <button onclick="navigate('/admin/vault')" class="admin-subtab admin-side-link" data-sub="vault" data-perm="vault"><i class="fa-solid fa-lock"></i>Vault</button>
+            <button onclick="navigate('/admin/roblox')" class="admin-subtab admin-side-link" data-sub="roblox" data-perm="roblox"><i class="fa-brands fa-google-play"></i>Roblox ID</button>
+            <button onclick="navigate('/admin/partners')" class="admin-subtab admin-side-link" data-sub="partners" data-perm="partners"><i class="fa-solid fa-handshake"></i>พาร์ทเนอร์</button>
+
+            <span class="admin-side-group-label">ผู้ใช้งาน</span>
+            <button onclick="navigate('/admin/members')" class="admin-subtab admin-side-link" data-sub="members" data-perm="members"><i class="fa-solid fa-users"></i>สมาชิก</button>
+            <button onclick="navigate('/admin/team')" class="admin-subtab admin-side-link" data-sub="team" data-perm="__admin_only__"><i class="fa-solid fa-user-tag"></i>ทีมงาน</button>
+            <button onclick="navigate('/admin/moderation')" class="admin-subtab admin-side-link" data-sub="moderation" data-perm="moderation"><i class="fa-solid fa-gavel"></i>รายงาน/แบน</button>
+
+            <span class="admin-side-group-label">การเงิน</span>
+            <button onclick="navigate('/admin/store')" class="admin-subtab admin-side-link" data-sub="store" data-perm="store"><i class="fa-solid fa-store"></i>ร้านค้า</button>
+            <button onclick="navigate('/admin/redeem')" class="admin-subtab admin-side-link" data-sub="redeem" data-perm="redeem"><i class="fa-solid fa-ticket"></i>โค้ดแลกรางวัล</button>
+            <button onclick="navigate('/admin/apikeys')" class="admin-subtab admin-side-link" data-sub="apikeys" data-perm="apikeys"><i class="fa-solid fa-key"></i>API Key เช็คสลิป</button>
+
+            <span class="admin-side-group-label">ระบบ/ตั้งค่า</span>
+            <button onclick="navigate('/admin/settings')" class="admin-subtab admin-side-link" data-sub="settings" data-perm="settings"><i class="fa-solid fa-sliders"></i>ตั้งค่าเว็บ</button>
+            <button onclick="navigate('/admin/loading')" class="admin-subtab admin-side-link" data-sub="loading" data-perm="settings"><i class="fa-solid fa-spinner"></i>หน้าโหลดเว็บ</button>
+            <button onclick="navigate('/admin/popup')" class="admin-subtab admin-side-link" data-sub="popup" data-perm="settings"><i class="fa-solid fa-gift"></i>ป็อปอัพต้อนรับ</button>
+            <button onclick="navigate('/admin/maintenance')" class="admin-subtab admin-side-link" data-sub="maintenance" data-perm="settings"><i class="fa-solid fa-power-off"></i>ปิดปรับปรุง</button>
+            <button onclick="navigate('/admin/webhooks')" class="admin-subtab admin-side-link" data-sub="webhooks" data-perm="webhooks"><i class="fa-brands fa-discord"></i>แจ้งเตือน</button>
+            <button onclick="navigate('/admin/audit')" class="admin-subtab admin-side-link" data-sub="audit" data-perm="__admin_only__"><i class="fa-solid fa-clipboard-list"></i>Audit Log</button>
+          </nav>
+        </aside>
+
+        <!-- เนื้อหาแท็บที่เลือก -->
+        <div class="flex-1 min-w-0">
+
+      <div id="admin-overview" class="admin-pane">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div class="panel-card p-4 rounded-xl"><span class="eyebrow text-[9px] text-slate-400 block uppercase mb-1">ออนไลน์</span><span id="ovOnline" class="text-xl font-bold text-slate-900 eyebrow">0</span></div>
+          <div class="panel-card p-4 rounded-xl"><span class="eyebrow text-[9px] text-slate-400 block uppercase mb-1">ยอดเข้าชม</span><span id="ovViews" class="text-xl font-bold text-slate-900 eyebrow">0</span></div>
+          <div class="panel-card p-4 rounded-xl"><span class="eyebrow text-[9px] text-slate-400 block uppercase mb-1">สคริปต์</span><span id="ovScripts" class="text-xl font-bold text-slate-900 eyebrow">0</span></div>
+          <div class="panel-card p-4 rounded-xl"><span class="eyebrow text-[9px] text-slate-400 block uppercase mb-1">ลิงก์ Vault</span><span id="ovVault" class="text-xl font-bold text-slate-900 eyebrow">0</span></div>
+          <div class="panel-card p-4 rounded-xl"><span class="eyebrow text-[9px] text-slate-400 block uppercase mb-1">สมาชิกทั้งหมด</span><span id="ovMembers" class="text-xl font-bold text-slate-900 eyebrow">0</span></div>
+        </div>
+      </div>
+
+      <div id="admin-scripts" class="admin-pane hidden">
+        <div id="adminScriptsTable" class="space-y-2"></div>
+      </div>
+
+      <div id="admin-partners" class="admin-pane hidden">
+        <form id="partnerForm" onsubmit="adminSubmitPartner(event)" class="panel-card rounded-xl p-4 space-y-2.5 mb-4 max-w-lg">
+          <p id="partnerFormTitle" class="text-xs font-semibold text-slate-900"><i class="fa-solid fa-handshake text-cyan mr-1.5"></i>เพิ่มพาร์ทเนอร์ใหม่</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <input id="apDiscordId" required placeholder="Discord ID" class="input-dark rounded-lg px-3 py-2 text-xs">
+            <input id="apUsername" required placeholder="ชื่อพาร์ทเนอร์" class="input-dark rounded-lg px-3 py-2 text-xs">
+          </div>
+          <div class="upload-drop">
+            <img id="apAvatarPreview" class="upload-preview" src="https://placehold.co/80x80/EFF6FF/93C5FD?text=IMG">
+            <div class="flex-1 min-w-0">
+              <label class="upload-drop-btn"><i class="fa-solid fa-upload mr-1"></i>แนบรูปจากเครื่อง<input type="file" accept="image/*" onchange="uploadAndFill(this,'apAvatar','apAvatarPreview')"></label>
+              <input id="apAvatar" placeholder="หรือวางลิงก์รูปภาพ" class="input-dark w-full rounded-lg px-3 py-1.5 text-[11px] mt-1.5" oninput="document.getElementById('apAvatarPreview').src=this.value||'https://placehold.co/80x80/EFF6FF/93C5FD?text=IMG'">
+            </div>
+          </div>
+          <textarea id="apDescription" rows="2" placeholder="คำอธิบายพาร์ทเนอร์ (ไม่บังคับ)" class="input-dark w-full rounded-lg px-3 py-2 text-xs"></textarea>
+          <input id="apDiscordInvite" placeholder="ลิงก์ Discord ของพาร์ทเนอร์ (ไม่บังคับ)" class="input-dark w-full rounded-lg px-3 py-2 text-xs">
+          <div class="flex gap-2">
+            <button class="btn-cyan flex-1 rounded-lg py-2 text-xs font-semibold" id="partnerFormSubmitBtn">เพิ่มพาร์ทเนอร์</button>
+            <button type="button" onclick="resetPartnerForm()" id="partnerFormCancelBtn" class="btn-ghost px-4 rounded-lg text-xs hidden">ยกเลิก</button>
+          </div>
+        </form>
+        <div id="adminPartnersList" class="space-y-2"></div>
+      </div>
+
+      <div id="admin-categories" class="admin-pane hidden">
+        <form id="categoryForm" onsubmit="adminSubmitCategory(event)" class="panel-card rounded-xl p-4 space-y-2.5 mb-4 max-w-lg">
+          <p id="categoryFormTitle" class="text-xs font-semibold text-slate-900"><i class="fa-solid fa-grip text-cyan mr-1.5"></i>เพิ่มหมวดหมู่ใหม่</p>
+          <input id="catTitle" required placeholder="ชื่อหมวดหมู่ เช่น Discord Product" class="input-dark w-full rounded-lg px-3 py-2 text-xs">
+          <input id="catSubtitle" placeholder="คำโปรย เช่น Good Quality (ไม่บังคับ)" class="input-dark w-full rounded-lg px-3 py-2 text-xs">
+          <div class="upload-drop">
+            <img id="catImagePreview" class="upload-preview" src="https://placehold.co/80x80/EFF6FF/93C5FD?text=IMG">
+            <div class="flex-1 min-w-0">
+              <label class="upload-drop-btn"><i class="fa-solid fa-upload mr-1"></i>แนบรูปจากเครื่อง<input type="file" accept="image/*" onchange="uploadAndFill(this,'catImage','catImagePreview')"></label>
+              <input id="catImage" placeholder="หรือวางลิงก์รูปภาพ" class="input-dark w-full rounded-lg px-3 py-1.5 text-[11px] mt-1.5" oninput="document.getElementById('catImagePreview').src=this.value||'https://placehold.co/80x80/EFF6FF/93C5FD?text=IMG'">
+            </div>
+          </div>
+          <input id="catLink" placeholder="ลิงก์ที่จะพาไป เมื่อกดการ์ดนี้" class="input-dark w-full rounded-lg px-3 py-2 text-xs">
+          <input id="catOrder" type="number" placeholder="ลำดับ (เลขน้อยแสดงก่อน)" class="input-dark w-full rounded-lg px-3 py-2 text-xs">
+          <div class="flex gap-2">
+            <button class="btn-cyan flex-1 rounded-lg py-2 text-xs font-semibold" id="categoryFormSubmitBtn">เพิ่มหมวดหมู่</button>
+            <button type="button" onclick="resetCategoryForm()" id="categoryFormCancelBtn" class="btn-ghost px-4 rounded-lg text-xs hidden">ยกเลิก</button>
+          </div>
+        </form>
+        <div id="adminCategoriesList" class="space-y-2"></div>
+      </div>
+
+      <div id="admin-team" class="admin-pane hidden">
+        <form id="teamForm" onsubmit="adminSubmitTeam(event)" class="panel-card rounded-xl p-4 space-y-3 mb-4 max-w-2xl">
+          <p id="teamFormTitle" class="text-xs font-semibold text-slate-900"><i class="fa-solid fa-user-plus text-cyan mr-1.5"></i>เพิ่มทีมงานใหม่</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <input id="atDiscordId" required placeholder="Discord ID" class="input-dark rounded-lg px-3 py-2 text-xs">
+            <input id="atRole" required placeholder="ตำแหน่ง เช่น ผู้ก่อตั้ง" class="input-dark rounded-lg px-3 py-2 text-xs">
+          </div>
+          <input id="atBio" placeholder="คำอธิบายสั้นๆ (ไม่บังคับ)" class="input-dark w-full rounded-lg px-3 py-2 text-xs">
+          <div>
+            <label class="block text-[11px] text-slate-500 mb-1.5"><i class="fa-solid fa-key text-cyan mr-1"></i>ยศ / สิทธิ์การจัดการหลังบ้าน (เลือกได้หลายอย่าง)</label>
+            <div id="atPermGrid" class="perm-grid"></div>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn-cyan flex-1 rounded-lg py-2 text-xs font-semibold" id="teamFormSubmitBtn">ดึงโปรไฟล์ + เพิ่ม</button>
+            <button type="button" onclick="resetTeamForm()" id="teamFormCancelBtn" class="btn-ghost px-4 rounded-lg text-xs hidden">ยกเลิก</button>
+          </div>
+        </form>
+        <p class="text-[11px] text-slate-400 mb-4">กรอกแค่ Discord ID ระบบจะดึงชื่อและรูปโปรไฟล์จาก Discord ให้อัตโนมัติ ไม่ต้องพิมพ์เอง</p>
+        <div id="adminTeamList" class="space-y-2"></div>
+      </div>
+
+      <div id="admin-roblox" class="admin-pane hidden">
+        <div class="panel-card rounded-xl p-4 flex flex-col sm:flex-row gap-2 mb-2">
+          <input id="arIdInput" placeholder="ใส่ Roblox Sound ID หรือวางลิงก์" class="input-dark flex-1 rounded-lg px-3 py-2 text-xs">
+          <input id="arNameInput" placeholder="ตั้งชื่อเอง (ไม่บังคับ)" class="input-dark flex-1 rounded-lg px-3 py-2 text-xs">
+          <select id="arGenreInput" class="input-dark rounded-lg px-3 py-2 text-xs"></select>
+          <button onclick="adminAddRoblox()" class="btn-cyan px-4 rounded-lg text-xs font-semibold shrink-0">ดึงข้อมูล + เพิ่มเข้าคลัง</button>
+        </div>
+        <p class="text-[11px] text-slate-400 mb-5">เว้นช่องชื่อไว้ = ใช้ชื่อจริงจาก Roblox / ID จะแสดงบนการ์ดเสมอ · แก้ชื่อ/หมวดหมู่ทีหลังได้ด้วยไอคอนดินสอบนการ์ด · ลบรายการออกได้ที่ปุ่มถังขยะ (ขึ้นให้เฉพาะแอดมิน)</p>
+
+        <div class="panel-card rounded-xl p-4">
+          <p class="text-xs font-semibold text-slate-900 mb-3"><i class="fa-solid fa-grip text-cyan mr-1.5"></i>จัดการหมวดหมู่เพลง</p>
+          <form onsubmit="adminSubmitGenre(event)" class="space-y-2.5 mb-4 max-w-md">
+            <input type="hidden" id="genreEditId">
+            <input id="genreTitle" required placeholder="ชื่อหมวดหมู่ เช่น เพลงดัง" class="input-dark w-full rounded-lg px-3 py-2 text-xs">
+            <div class="upload-drop">
+              <img id="genreImagePreview" class="upload-preview" src="https://placehold.co/80x80/EFF6FF/93C5FD?text=IMG">
+              <div class="flex-1 min-w-0">
+                <label class="upload-drop-btn"><i class="fa-solid fa-upload mr-1"></i>แนบรูปจากเครื่อง<input type="file" accept="image/*" onchange="uploadAndFill(this,'genreImage','genreImagePreview')"></label>
+                <input id="genreImage" placeholder="หรือวางลิงก์รูปภาพ" class="input-dark w-full rounded-lg px-3 py-1.5 text-[11px] mt-1.5" oninput="document.getElementById('genreImagePreview').src=this.value||'https://placehold.co/80x80/EFF6FF/93C5FD?text=IMG'">
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button class="btn-cyan flex-1 rounded-lg py-2 text-xs font-semibold" id="genreSubmitBtn">เพิ่มหมวดหมู่</button>
+              <button type="button" onclick="resetGenreForm()" id="genreCancelBtn" class="btn-ghost px-4 rounded-lg text-xs hidden">ยกเลิก</button>
+            </div>
+          </form>
+          <div id="adminGenresList" class="space-y-2"></div>
+        </div>
+      </div>
+
+      <div id="admin-vault" class="admin-pane hidden">
+        <div id="adminVaultList" class="space-y-2"></div>
+      </div>
+
+      <div id="admin-members" class="admin-pane hidden">
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5 max-w-lg">
+          <div class="panel-card p-4 rounded-xl"><span class="eyebrow text-[9px] text-slate-400 block uppercase mb-1">สมาชิกทั้งหมด</span><span id="memTotal" class="text-xl font-bold text-slate-900 eyebrow">0</span></div>
+          <div class="panel-card p-4 rounded-xl"><span class="eyebrow text-[9px] text-slate-400 block uppercase mb-1">ออนไลน์ตอนนี้</span><span id="memOnline" class="text-xl font-bold text-slate-900 eyebrow">0</span></div>
+          <div class="panel-card p-4 rounded-xl"><span class="eyebrow text-[9px] text-slate-400 block uppercase mb-1">เข้าเว็บวันนี้</span><span id="memToday" class="text-xl font-bold text-slate-900 eyebrow">0</span></div>
+        </div>
+
+        <div class="panel-card rounded-xl p-4 mb-5">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-xs font-semibold text-slate-900"><i class="fa-solid fa-chart-column text-cyan mr-1.5"></i>สถิติผู้เข้าชม</p>
+            <div class="flex gap-1 bg-slate-100 rounded-lg p-1">
+              <button onclick="switchStatsChart('daily')" data-chart-range="daily" class="chart-range-btn active px-2.5 py-1 rounded-md text-[10px] font-medium">รายวัน</button>
+              <button onclick="switchStatsChart('monthly')" data-chart-range="monthly" class="chart-range-btn px-2.5 py-1 rounded-md text-[10px] font-medium">รายเดือน</button>
+              <button onclick="switchStatsChart('yearly')" data-chart-range="yearly" class="chart-range-btn px-2.5 py-1 rounded-md text-[10px] font-medium">รายปี</button>
+            </div>
+          </div>
+          <div id="statsChartWrap" class="w-full overflow-x-auto"><p class="text-xs text-slate-400 text-center py-8">กำลังโหลด...</p></div>
+        </div>
+
+        <div id="adminMembersList" class="space-y-2"></div>
+      </div>
+
+      <div id="admin-moderation" class="admin-pane hidden">
+        <div class="flex gap-2 mb-4">
+          <button onclick="modTab('reports')" data-mod-tab="reports" class="mod-tab-btn active px-3.5 py-1.5 rounded-lg text-xs font-medium">รายงาน</button>
+          <button onclick="modTab('bans')" data-mod-tab="bans" class="mod-tab-btn px-3.5 py-1.5 rounded-lg text-xs font-medium">แบนผู้ใช้</button>
+        </div>
+
+        <div id="mod-reports" class="space-y-2"></div>
+
+        <div id="mod-bans" class="hidden">
+          <form onsubmit="adminBanUser(event)" class="panel-card rounded-xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4 max-w-2xl">
+            <input id="banDiscordId" required placeholder="Discord ID ที่จะแบน" class="input-dark rounded-lg px-3 py-2 text-xs">
+            <input id="banReason" required placeholder="เหตุผล" class="input-dark rounded-lg px-3 py-2 text-xs sm:col-span-1">
+            <button class="btn-danger rounded-lg text-xs font-semibold py-2">แบน + แจ้งเตือน DM</button>
+          </form>
+          <div id="adminBansList" class="space-y-2"></div>
+        </div>
+      </div>
+
+      <div id="admin-webhooks" class="admin-pane hidden">
+        <form onsubmit="adminAddWebhook(event)" class="panel-card rounded-xl p-4 space-y-2.5 mb-4 max-w-2xl">
+          <p class="text-xs font-semibold text-slate-900"><i class="fa-solid fa-plus text-cyan mr-1.5"></i>เพิ่ม Webhook ใหม่</p>
+          <input id="whName" placeholder="ชื่อ (เช่น #แจ้งเตือนสคริปต์)" class="input-dark w-full rounded-lg px-3 py-2 text-xs">
+          <input id="whUrl" required placeholder="วางลิงก์ Discord Webhook ที่นี่" class="input-dark w-full rounded-lg px-3 py-2 text-xs">
+          <div>
+            <label class="block text-[11px] text-slate-500 mb-1.5">แจ้งเตือนหมวดไหนบ้าง</label>
+            <div id="whEventGrid" class="perm-grid"></div>
+          </div>
+          <button class="btn-cyan rounded-lg text-xs font-semibold py-2 px-5"><i class="fa-solid fa-plus mr-1"></i>เพิ่ม Webhook</button>
+        </form>
+        <div id="adminWebhooksList" class="space-y-2"></div>
+      </div>
+
+      <div id="admin-settings" class="admin-pane hidden">
+        <form onsubmit="adminSaveSettings(event)" class="panel-card rounded-xl p-5 max-w-lg space-y-3">
+          <div><label class="block text-[11px] text-slate-500 mb-1">ชื่อเว็บไซต์</label><input id="stSiteName" class="input-dark w-full rounded-lg px-3 py-2 text-xs"></div>
+          <div><label class="block text-[11px] text-slate-500 mb-1">แท็กไลน์</label><input id="stTagline" class="input-dark w-full rounded-lg px-3 py-2 text-xs"></div>
+          <div><label class="block text-[11px] text-slate-500 mb-1">ข้อความใต้หัวข้อหลัก</label><input id="stHeroNote" class="input-dark w-full rounded-lg px-3 py-2 text-xs"></div>
+          <div><label class="block text-[11px] text-slate-500 mb-1">ป้ายประกาศแบบเลื่อน (ว่าง = ไม่แสดง)</label><input id="stAnnouncement" class="input-dark w-full rounded-lg px-3 py-2 text-xs" placeholder="เช่น เซิร์ฟเวอร์อัปเดตใหม่ 18 ส.ค. — เพิ่มสคริปต์กว่า 20 รายการ"></div>
+          <div><label class="block text-[11px] text-slate-500 mb-1">ลิงก์โลโก้ (ไม่บังคับ)</label><input id="stLogoUrl" class="input-dark w-full rounded-lg px-3 py-2 text-xs"></div>
+          <div><label class="block text-[11px] text-slate-500 mb-1">ลิงก์เชิญ Discord</label><input id="stDiscordInvite" class="input-dark w-full rounded-lg px-3 py-2 text-xs"></div>
+          <button class="btn-cyan w-full py-2.5 rounded-xl text-xs font-semibold">บันทึกการตั้งค่า</button>
+        </form>
+      </div>
+
+      <div id="admin-loading" class="admin-pane hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 max-w-4xl">
+          <form onsubmit="adminSaveLoading(event)" class="panel-card rounded-xl p-5 space-y-3">
+            <div>
+              <label class="block text-[11px] text-slate-500 mb-1">รูปพื้นหลังหน้าโหลดเว็บ</label>
+              <div class="upload-drop">
+                <img id="lsImagePreview" class="upload-preview" src="https://placehold.co/80x80/0F172A/38BDF8?text=IMG">
+                <div class="flex-1 min-w0">
+                  <label class="upload-drop-btn"><i class="fa-solid fa-upload mr-1"></i>แนบไฟล์จากเครื่อง<input type="file" accept="image/*" onchange="uploadAndFill(this,'lsImageUrl','lsImagePreview')"></label>
+                  <input id="lsImageUrl" placeholder="หรือวางลิงก์รูปภาพ" class="input-dark w-full rounded-lg px-3 py-1.5 text-[11px] mt-1.5" oninput="document.getElementById('lsImagePreview').src=this.value||'https://placehold.co/80x80/0F172A/38BDF8?text=IMG'">
+                </div>
+              </div>
+            </div>
+            <div><label class="block text-[11px] text-slate-500 mb-1">ข้อความตอนโหลด</label><input id="lsTextInput" class="input-dark w-full rounded-lg px-3 py-2 text-xs" placeholder="เช่น กำลังโหลดหน้าเว็บ"></div>
+            <button class="btn-cyan w-full py-2.5 rounded-xl text-xs font-semibold">บันทึกหน้าโหลดเว็บ</button>
+          </form>
+          <div class="panel-card rounded-xl p-5">
+            <p class="eyebrow text-[9.5px] text-slate-400 mb-3 uppercase"><i class="fa-solid fa-circle-info mr-1"></i>เกี่ยวกับหน้านี้</p>
+            <p class="text-[11px] text-slate-400 leading-relaxed">หน้าจอนี้จะขึ้นทุกครั้งที่มีคนเข้าเว็บ (ไม่ใช่แค่ครั้งแรก) ระหว่างที่เว็บกำลังโหลดข้อมูล คนละส่วนกับ "ป็อปอัพต้อนรับ" ซึ่งเป็นป็อปอัพโปรโมชั่นที่จะขึ้นหลังจากหน้าโหลดนี้ปิดไปแล้ว และมีระบบ "ไม่แสดงอีก 24 ชม." แยกต่างหาก</p>
+          </div>
+        </div>
+      </div>
+      <div id="admin-popup" class="admin-pane hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 max-w-4xl">
+          <form onsubmit="adminSavePopup(event)" class="panel-card rounded-xl p-5 space-y-3">
+            <div class="flex items-center justify-between bg-slate-100 border border-line rounded-xl px-3.5 py-2.5">
+              <span class="text-xs font-medium text-slate-700"><i class="fa-solid fa-gift text-cyan mr-1.5"></i>เปิดใช้งานป็อปอัพต้อนรับ</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="wpEnabled" class="sr-only peer">
+                <div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:bg-cyan transition-colors"></div>
+                <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+              </label>
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-500 mb-1">รูปพื้นหลัง (ไม่บังคับ)</label>
+              <div class="upload-drop">
+                <img id="wpImagePreview" class="upload-preview" src="https://placehold.co/80x80/EFF6FF/93C5FD?text=IMG">
+                <div class="flex-1 min-w0">
+                  <label class="upload-drop-btn"><i class="fa-solid fa-upload mr-1"></i>แนบไฟล์จากเครื่อง<input type="file" accept="image/*" onchange="uploadAndFill(this,'wpImageUrl','wpImagePreview')"></label>
+                  <input id="wpImageUrl" placeholder="หรือวางลิงก์รูปภาพ" class="input-dark w-full rounded-lg px-3 py-1.5 text-[11px] mt-1.5" oninput="document.getElementById('wpImagePreview').src=this.value||'https://placehold.co/80x80/EFF6FF/93C5FD?text=IMG'">
+                </div>
+              </div>
+            </div>
+            <div><label class="block text-[11px] text-slate-500 mb-1">หัวข้อใหญ่</label><input id="wpTitleInput" class="input-dark w-full rounded-lg px-3 py-2 text-xs" placeholder="เช่น แจก CODE ฟรี"></div>
+            <div><label class="block text-[11px] text-slate-500 mb-1">โค้ด/คำเด่น (ไม่บังคับ)</label><input id="wpCodeInput" class="input-dark w-full rounded-lg px-3 py-2 text-xs" placeholder="เช่น WELCOME"></div>
+            <div><label class="block text-[11px] text-slate-500 mb-1">คำอธิบาย</label><textarea id="wpDescInput" rows="2" class="input-dark w-full rounded-lg px-3 py-2 text-xs" placeholder="เช่น รับไปเลย เครดิตฟรีในเว็บไซต์"></textarea></div>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="block text-[11px] text-slate-500 mb-1">ข้อความปุ่ม</label><input id="wpBtnText" class="input-dark w-full rounded-lg px-3 py-2 text-xs" placeholder="ดูเพิ่มเติม"></div>
+              <div><label class="block text-[11px] text-slate-500 mb-1">ลิงก์ปุ่ม (ไม่บังคับ)</label><input id="wpBtnLink" class="input-dark w-full rounded-lg px-3 py-2 text-xs" placeholder="https://discord.gg/..."></div>
+            </div>
+            <button class="btn-cyan w-full py-2.5 rounded-xl text-xs font-semibold">บันทึกป็อปอัพ</button>
+          </form>
+
+          <div class="panel-card rounded-xl p-5">
+            <p class="eyebrow text-[9.5px] text-slate-400 mb-3 uppercase"><i class="fa-solid fa-eye mr-1"></i>ตัวอย่าง</p>
+            <button type="button" onclick="previewWelcomePopup()" class="btn-ghost w-full py-2.5 rounded-xl text-xs font-semibold mb-3"><i class="fa-solid fa-play mr-1.5"></i>ดูตัวอย่างป็อปอัพ</button>
+            <p class="text-[11px] text-slate-400 leading-relaxed">ป็อปอัพจะขึ้นให้ผู้เข้าชมทุกคนเห็นตอนเข้าเว็บครั้งแรก (หรือหลังครบ 24 ชม. ถ้าติ๊ก "ไม่แสดงอีก") บันทึกแล้วมีผลทันที</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ร้านค้า (admin) ===== -->
+      <div id="admin-store" class="admin-pane hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-5">
+          <div class="panel-card p-4 rounded-xl"><span class="eyebrow text-[9px] text-slate-400 block uppercase mb-1">สินค้าทั้งหมด</span><span id="adminStoreProductCount" class="text-xl font-bold text-slate-900 eyebrow">0</span></div>
+          <div class="panel-card p-4 rounded-xl"><span class="eyebrow text-[9px] text-slate-400 block uppercase mb-1">ออเดอร์ทั้งหมด</span><span id="adminStoreOrderCount" class="text-xl font-bold text-slate-900 eyebrow">0</span></div>
+          <div class="panel-card p-4 rounded-xl"><span class="eyebrow text-[9px] text-slate-400 block uppercase mb-1">ยอดขายรวม</span><span id="adminStoreRevenue" class="text-xl font-bold text-cyan eyebrow">0 บาท</span></div>
+        </div>
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-sm font-bold text-slate-900"><i class="fa-solid fa-receipt text-cyan mr-1.5"></i>ออเดอร์ล่าสุด</p>
+          <button onclick="document.querySelector('[data-tab=store]').click(); closeNavMenu()" class="btn-ghost px-3 py-1.5 rounded-lg text-[11px]"><i class="fa-solid fa-store mr-1"></i>ไปหน้าร้านค้า</button>
+        </div>
+        <div id="adminOrdersTable" class="space-y-2"></div>
+      </div>
+
+      <!-- ===== โค้ดแลกรางวัล (admin) ===== -->
+      <div id="admin-redeem" class="admin-pane hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-5">
+          <form onsubmit="submitRedeemCode(event)" class="panel-card rounded-xl p-5 space-y-3 h-fit">
+            <p class="text-sm font-bold text-slate-900 mb-1"><i class="fa-solid fa-plus text-cyan mr-1.5"></i>สร้างโค้ดใหม่</p>
+            <div><label class="block text-[11px] text-slate-500 mb-1">โค้ด (เว้นว่าง = สุ่มให้อัตโนมัติ)</label><input id="rcCode" placeholder="เช่น WELCOME2026" class="input-dark w-full rounded-lg px-3 py-2 text-xs uppercase"></div>
+            <div>
+              <label class="block text-[11px] text-slate-500 mb-1">รางวัลที่จะได้รับ</label>
+              <select id="rcRewardType" onchange="toggleRedeemValueField()" class="input-dark w-full rounded-lg px-3 py-2 text-xs">
+                <option value="wallet">💰 เงินเข้ากระเป๋า (บาท)</option>
+                <option value="link">🔗 ลิงก์</option>
+                <option value="message">📝 ข้อความ/โค้ดลับ</option>
+              </select>
+            </div>
+            <div>
+              <label id="rcValueLabel" class="block text-[11px] text-slate-500 mb-1">จำนวนเงิน (บาท)</label>
+              <input id="rcValueNumber" type="number" min="1" step="1" placeholder="เช่น 50" class="input-dark w-full rounded-lg px-3 py-2 text-xs">
+              <textarea id="rcValueText" rows="3" placeholder="วางลิงก์หรือข้อความที่จะให้ผู้แลกโค้ดเห็น" class="input-dark w-full rounded-lg px-3 py-2 text-xs hidden"></textarea>
+            </div>
+            <div><label class="block text-[11px] text-slate-500 mb-1">จำนวนคนใช้ได้ (ต่อโค้ด)</label><input id="rcMaxUses" type="number" min="1" step="1" value="1" class="input-dark w-full rounded-lg px-3 py-2 text-xs"></div>
+            <button class="btn-cyan w-full py-2.5 rounded-xl text-xs font-semibold">สร้างโค้ด</button>
+          </form>
+
+          <div>
+            <p class="text-sm font-bold text-slate-900 mb-3"><i class="fa-solid fa-ticket text-cyan mr-1.5"></i>โค้ดทั้งหมด</p>
+            <div id="redeemCodesTable" class="space-y-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== API Key เช็คสลิป (admin) ===== -->
+      <div id="admin-apikeys" class="admin-pane hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-5">
+          <div class="panel-card rounded-xl p-5 h-fit space-y-3">
+            <p class="text-sm font-bold text-slate-900 mb-1"><i class="fa-solid fa-key text-cyan mr-1.5"></i>Slip Check API</p>
+            <p class="text-[11.5px] text-slate-500 leading-relaxed">สมาชิกกดขอ API key จากหน้าเว็บได้เอง แต่ต้องรออนุมัติจากตรงนี้ก่อนถึงจะใช้งานได้จริง</p>
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-[10.5px] text-amber-800 leading-relaxed">
+              <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+              API นี้อ่าน QR Code ในสลิปเพื่อกันสลิปซ้ำ และอ่านยอดเงินได้ถ้า QR เป็นรูปแบบ EMVCo เท่านั้น — <b>ไม่ได้เชื่อมต่อกับธนาคารจริง</b> จึงยืนยัน 100% ไม่ได้ว่ามีการโอนเงินจริง เหมาะกับใช้เป็นด่านแรกกรองสลิปซ้ำ/ปลอมง่ายๆ เท่านั้น
+            </div>
+            <div class="text-[10.5px] text-slate-400 leading-relaxed">
+              <p class="font-semibold text-slate-500 mb-1">วิธีเรียกใช้ (สำหรับคนที่ได้รับอนุมัติ):</p>
+              <code class="block bg-slate-100 border border-line rounded-lg p-2 font-mono text-[10px] whitespace-pre-wrap">POST /api/slip-check
+Header: X-API-Key: flx_xxxxxxxx
+Body: multipart/form-data field "file" = รูปสลิป</code>
+            </div>
+          </div>
+
+          <div>
+            <p class="text-sm font-bold text-slate-900 mb-3"><i class="fa-solid fa-list-check text-cyan mr-1.5"></i>คำขอทั้งหมด</p>
+            <div id="apikeyRequestsList" class="space-y-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ปิดปรับปรุงเว็บ (admin) ===== -->
+      <div id="admin-maintenance" class="admin-pane hidden">
+        <form onsubmit="adminSaveMaintenance(event)" class="panel-card rounded-xl p-5 max-w-2xl space-y-3">
+          <div class="flex items-center justify-between bg-slate-100 border border-line rounded-xl px-3.5 py-2.5">
+            <div>
+              <span class="text-xs font-medium text-slate-700 block"><i class="fa-solid fa-power-off text-danger mr-1.5"></i>เปิดโหมดปิดปรับปรุงเว็บ</span>
+              <span class="text-[10.5px] text-slate-400">เปิดแล้วผู้เข้าชมทั่วไปจะเห็นหน้านี้แทนเว็บจริงทันที (ทีมงาน/แอดมินยังเข้าเว็บจริงได้ปกติ)</span>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-3">
+              <input type="checkbox" id="mtEnabled" class="sr-only peer">
+              <div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:bg-danger transition-colors"></div>
+              <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+            </label>
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-500 mb-1">HTML หน้าปิดปรับปรุง (เว้นว่าง = ใช้หน้า default)</label>
+            <textarea id="mtHtml" rows="10" spellcheck="false" class="input-dark w-full rounded-lg px-3 py-2 text-[11px] font-mono" placeholder="&lt;!DOCTYPE html&gt;&lt;html&gt;...&lt;/html&gt;"></textarea>
+            <p class="text-[10.5px] text-slate-400 mt-1">ใส่โค้ด HTML เต็มหน้าได้เลย (รวม &lt;style&gt; ในตัว) ระบบจะแสดงตามที่พิมพ์เป๊ะๆ</p>
+          </div>
+          <button class="btn-cyan w-full py-2.5 rounded-xl text-xs font-semibold">บันทึก</button>
+        </form>
+      </div>
+
+      <!-- ===== Audit Log (แอดมินเต็มเท่านั้น) ===== -->
+      <div id="admin-audit" class="admin-pane hidden">
+        <div class="panel-card rounded-xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="text-sm font-semibold text-slate-900">ประวัติการกระทำของแอดมิน/ทีมงาน</h3>
+              <p class="text-[10.5px] text-slate-400 mt-0.5">บันทึกทุกคำขอที่แก้ไขข้อมูล (POST/PUT/PATCH/DELETE) จากบัญชีแอดมิน/ทีมงาน ย้อนหลัง 300 รายการล่าสุด</p>
+            </div>
+            <button onclick="loadAuditLog()" class="btn-ghost text-[11px] px-3 py-1.5 rounded-lg"><i class="fa-solid fa-rotate-right mr-1"></i>รีเฟรช</button>
+          </div>
+          <div id="auditLogList" class="space-y-1.5 max-h-[70vh] overflow-y-auto"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="border-t border-line mt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <span class="text-[11px] text-slate-400 eyebrow">© <span id="footerBrand">FLEXOZY</span> — ROBLOX SCRIPT COMMUNITY</span>
+    <a id="footerDiscord" href="#" target="_blank" class="hidden text-xs text-cyan"><i class="fa-brands fa-discord mr-1"></i>เข้าร่วม Discord</a>
+  </div>
+</footer>
+
+<!-- Mini music player -->
+<div id="miniPlayer" class="hidden">
+  <div class="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
+    <button onclick="toggleMiniPlayer()" id="miniPlayBtn" class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white"><i class="fa-solid fa-pause text-xs"></i></button>
+    <img id="miniPlayerThumb" class="hidden sm:block" src="">
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-1.5 mb-1.5">
+        <div id="miniEq" class="flex items-end gap-[2px] h-3 shrink-0">
+          <span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span>
+        </div>
+        <p id="miniPlayerTitle" class="text-xs font-medium text-slate-900 truncate">-</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span id="miniTimeCurrent" class="text-[9px] text-slate-400 eyebrow shrink-0 w-8 text-right">0:00</span>
+        <input type="range" id="miniSeek" min="0" max="100" value="0" step="0.1" class="seek-bar flex-1">
+        <span id="miniTimeDuration" class="text-[9px] text-slate-400 eyebrow shrink-0 w-8">0:00</span>
+      </div>
+    </div>
+    <div class="vol-wrap shrink-0">
+      <button id="miniMuteBtn" class="vol-mute-btn" title="ปิด/เปิดเสียง"><i class="fa-solid fa-volume-high text-xs"></i></button>
+      <input type="range" id="miniVolume" min="0" max="100" value="80" class="vol-slider" title="ระดับเสียง">
+    </div>
+    <button onclick="closeMiniPlayer()" class="text-slate-400 hover:text-slate-900 w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <audio id="miniAudio"></audio>
+</div>
+
+<!-- Modal เพิ่ม/แก้ไขสคริปต์ -->
+<div id="scriptModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-white border border-line w-full max-w-md rounded-2xl p-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+    <button onclick="closeScriptModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-900"><i class="fa-solid fa-xmark"></i></button>
+    <h2 id="scriptModalTitle" class="text-base font-bold text-slate-900 mb-3"><i class="fa-solid fa-circle-plus text-cyan mr-1.5"></i>เพิ่มสคริปต์ใหม่</h2>
+    <form id="addScriptForm" onsubmit="submitScript(event)" class="space-y-3">
+      <div><label class="block text-[11px] text-slate-500 mb-1">ชื่อสคริปต์ *</label><input type="text" id="scriptTitle" required class="input-dark w-full rounded-xl px-3.5 py-2 text-xs"></div>
+      <div><label class="block text-[11px] text-slate-500 mb-1">ชื่อเกม Roblox *</label><input type="text" id="scriptGame" required class="input-dark w-full rounded-xl px-3.5 py-2 text-xs"></div>
+      <div>
+        <label class="block text-[11px] text-slate-500 mb-1">รูปภาพปก</label>
+        <div class="upload-drop">
+          <img id="scriptImagePreview" class="upload-preview" src="https://placehold.co/80x80/EFF6FF/93C5FD?text=IMG">
+          <div class="flex-1 min-w-0">
+            <label class="upload-drop-btn"><i class="fa-solid fa-upload mr-1"></i>แนบรูปจากเครื่อง<input type="file" accept="image/*" onchange="uploadAndFill(this,'scriptImage','scriptImagePreview')"></label>
+            <input type="url" id="scriptImage" placeholder="หรือวางลิงก์รูปภาพ" class="input-dark w-full rounded-lg px-3 py-1.5 text-[11px] mt-1.5" oninput="document.getElementById('scriptImagePreview').src=this.value||'https://placehold.co/80x80/EFF6FF/93C5FD?text=IMG'">
+          </div>
+        </div>
+      </div>
+      <div><label class="block text-[11px] text-slate-500 mb-1">โค้ดสคริปต์ (Lua) *</label><textarea id="scriptCode" required rows="4" class="code-area w-full rounded-xl p-3 text-xs"></textarea></div>
+      <div class="flex items-center gap-2"><input type="checkbox" id="scriptKeySystem" class="rounded border-line bg-white text-cyan"><label for="scriptKeySystem" class="text-xs text-slate-600">มีระบบ Key System</label></div>
+      <div class="pt-2 flex justify-end gap-2"><button type="button" onclick="closeScriptModal()" class="btn-ghost px-3.5 py-2 rounded-xl text-xs">ยกเลิก</button><button type="submit" class="btn-cyan px-4 py-2 rounded-xl text-xs font-semibold">บันทึก</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal สินค้า (แอดมิน/ทีมงาน) -->
+<div id="productModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-white border border-line w-full max-w-md rounded-2xl p-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+    <button onclick="closeProductModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-900"><i class="fa-solid fa-xmark"></i></button>
+    <h2 id="productModalTitle" class="text-base font-bold text-slate-900 mb-3"><i class="fa-solid fa-store text-cyan mr-1.5"></i>เพิ่มสินค้าใหม่</h2>
+    <form id="addProductForm" onsubmit="submitProduct(event)" class="space-y-3">
+      <input type="hidden" id="productId">
+      <div><label class="block text-[11px] text-slate-500 mb-1">ชื่อสินค้า *</label><input type="text" id="productTitle" required class="input-dark w-full rounded-xl px-3.5 py-2 text-xs"></div>
+      <div><label class="block text-[11px] text-slate-500 mb-1">รายละเอียด</label><textarea id="productDescription" rows="2" class="input-dark w-full rounded-xl px-3.5 py-2 text-xs"></textarea></div>
+      <div>
+        <label class="block text-[11px] text-slate-500 mb-1">รูปภาพสินค้า</label>
+        <div class="upload-drop">
+          <img id="productImagePreview" class="upload-preview" src="https://placehold.co/80x80/151B2B/38BDF8?text=IMG">
+          <div class="flex-1 min-w-0">
+            <label class="upload-drop-btn"><i class="fa-solid fa-upload mr-1"></i>แนบรูปจากเครื่อง<input type="file" accept="image/*" onchange="uploadAndFill(this,'productImage','productImagePreview')"></label>
+            <input type="url" id="productImage" placeholder="หรือวางลิงก์รูปภาพ" class="input-dark w-full rounded-lg px-3 py-1.5 text-[11px] mt-1.5" oninput="document.getElementById('productImagePreview').src=this.value||'https://placehold.co/80x80/151B2B/38BDF8?text=IMG'">
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-[11px] text-slate-500 mb-1">ราคา (บาท) *</label><input type="number" id="productPrice" min="0" step="1" required class="input-dark w-full rounded-xl px-3.5 py-2 text-xs"></div>
+        <div><label class="block text-[11px] text-slate-500 mb-1">สต็อก (เว้นว่าง = ไม่จำกัด)</label><input type="number" id="productStock" min="0" step="1" class="input-dark w-full rounded-xl px-3.5 py-2 text-xs"></div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-[11px] text-slate-500 mb-1">หมวดหมู่</label><input type="text" id="productCategory" placeholder="เช่น Roblox, Discord" class="input-dark w-full rounded-xl px-3.5 py-2 text-xs"></div>
+        <div><label class="block text-[11px] text-slate-500 mb-1">ประเภท</label>
+          <select id="productType" class="input-dark w-full rounded-xl px-3.5 py-2 text-xs">
+            <option value="script">สคริปต์ Roblox</option>
+            <option value="discord_service">บริการ Discord</option>
+            <option value="other">อื่นๆ</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex items-center gap-2"><input type="checkbox" id="productActive" checked class="rounded border-line bg-white text-cyan"><label for="productActive" class="text-xs text-slate-600">เปิดขายอยู่</label></div>
+      <div class="pt-2 flex justify-end gap-2"><button type="button" onclick="closeProductModal()" class="btn-ghost px-3.5 py-2 rounded-xl text-xs">ยกเลิก</button><button type="submit" class="btn-cyan px-4 py-2 rounded-xl text-xs font-semibold">บันทึก</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal เติมเงินผ่าน TrueMoney -->
+<div id="topupModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-white border border-line w-full max-w-sm rounded-2xl p-5 shadow-2xl relative">
+    <button onclick="closeTopupModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-900"><i class="fa-solid fa-xmark"></i></button>
+    <h2 class="text-base font-bold text-slate-900 mb-1"><i class="fa-solid fa-wallet text-cyan mr-1.5"></i>เติมเงินผ่าน TrueMoney</h2>
+    <p class="text-[11px] text-slate-500 mb-4">เปิดแอป TrueMoney → ส่ง "ซองอั่งเปา" ตามยอดที่ต้องการเติม → คัดลอกลิงก์ซองมาวางด้านล่าง</p>
+    <form onsubmit="submitTopup(event)" class="space-y-3">
+      <div><label class="block text-[11px] text-slate-500 mb-1">ลิงก์ซองอั่งเปา *</label><input type="text" id="topupLink" required placeholder="https://gift.truemoney.com/campaign/?v=..." class="input-dark w-full rounded-xl px-3.5 py-2 text-xs"></div>
+      <div id="topupResult" class="hidden text-xs rounded-lg p-2.5"></div>
+      <div class="pt-1 flex justify-end gap-2"><button type="button" onclick="closeTopupModal()" class="btn-ghost px-3.5 py-2 rounded-xl text-xs">ยกเลิก</button><button type="submit" id="topupSubmitBtn" class="btn-cyan px-4 py-2 rounded-xl text-xs font-semibold">แลกซอง</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal คอมเมนต์ -->
+<div id="commentModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-white border border-line w-full max-w-lg rounded-2xl p-5 shadow-2xl relative max-h-[85vh] flex flex-col">
+    <button onclick="closeCommentModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-900"><i class="fa-solid fa-xmark"></i></button>
+    <h2 class="text-base font-bold text-slate-900 mb-3"><i class="fa-solid fa-comments text-cyan mr-1.5"></i>ความคิดเห็นทั้งหมด</h2>
+    <div id="commentList" class="flex-1 overflow-y-auto space-y-3 pr-1 mb-4 max-h-[50vh]"></div>
+    <form onsubmit="submitComment(event)" class="flex gap-2 border-t border-line pt-3">
+      <input type="text" id="commentInput" placeholder="พิมพ์ความคิดเห็นของคุณ..." required class="input-dark flex-1 rounded-xl px-3.5 py-2 text-xs">
+      <button type="submit" class="btn-cyan px-4 py-2 rounded-xl text-xs font-semibold"><i class="fa-solid fa-paper-plane"></i></button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal โปรไฟล์ -->
+<div id="profileModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-white border border-line w-full max-w-sm rounded-2xl shadow-2xl relative overflow-hidden">
+    <button onclick="closeProfileModal()" class="absolute top-3 right-3 z-10 text-white/90 hover:text-white bg-black/30 hover:bg-black/45 w-7 h-7 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark text-xs"></i></button>
+    <div id="profileModalBody" class="pb-5"></div>
+  </div>
+</div>
+
+<!-- Modal ดูโค้ดฝั่งแอดมิน (Vault) -->
+<div id="adminCodeModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-white border border-line w-full max-w-lg rounded-2xl p-5 shadow-2xl relative">
+    <button onclick="closeAdminCodeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-900"><i class="fa-solid fa-xmark"></i></button>
+    <h2 id="adminCodeModalTitle" class="text-base font-bold text-slate-900 mb-3"><i class="fa-solid fa-eye text-cyan mr-1.5"></i>เนื้อโค้ด</h2>
+    <pre id="adminCodeModalBody" class="lua-code w-full rounded-xl p-3 text-xs" style="max-height:340px;overflow:auto"></pre>
+    <button onclick="copyAdminCodeModal()" class="btn-cyan w-full py-2 rounded-xl text-xs font-semibold mt-3"><i class="fa-regular fa-copy mr-1.5"></i>คัดลอกโค้ด</button>
+  </div>
+</div>
+
+<!-- Modal แก้ไขลิงก์ Vault ของตัวเอง (เปลี่ยนโค้ด/รหัสผ่านได้) -->
+<div id="vaultEditModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-white border border-line w-full max-w-lg rounded-2xl p-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+    <button onclick="closeVaultEditModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-900"><i class="fa-solid fa-xmark"></i></button>
+    <h2 class="text-base font-bold text-slate-900 mb-3"><i class="fa-solid fa-pen text-cyan mr-1.5"></i>แก้ไขลิงก์ Vault</h2>
+    <form onsubmit="submitVaultEdit(event)" class="space-y-3">
+      <input type="hidden" id="veCode">
+      <div><label class="block text-[11px] text-slate-500 mb-1">ชื่อลิงก์</label><input id="veTitle" class="input-dark w-full rounded-xl px-3.5 py-2 text-xs"></div>
+      <div>
+        <label class="block text-[11px] text-slate-500 mb-1">รูปปก</label>
+        <div class="upload-drop">
+          <img id="veImagePreview" class="upload-preview" src="https://placehold.co/80x80/EFF6FF/93C5FD?text=IMG">
+          <div class="flex-1 min-w-0">
+            <label class="upload-drop-btn"><i class="fa-solid fa-upload mr-1"></i>แนบรูปจากเครื่อง<input type="file" accept="image/*" onchange="uploadAndFill(this,'veImage','veImagePreview')"></label>
+            <input id="veImage" placeholder="หรือวางลิงก์รูปภาพ" class="input-dark w-full rounded-lg px-3 py-1.5 text-[11px] mt-1.5" oninput="document.getElementById('veImagePreview').src=this.value||'https://placehold.co/80x80/EFF6FF/93C5FD?text=IMG'">
+          </div>
+        </div>
+      </div>
+      <div><label class="block text-[11px] text-slate-500 mb-1">โค้ด</label><textarea id="veScript" rows="8" class="code-area w-full rounded-xl p-3 text-xs"></textarea></div>
+      <div>
+        <label class="block text-[11px] text-slate-500 mb-1">เปลี่ยนรหัสผ่าน (เว้นว่าง = ไม่เปลี่ยน)</label>
+        <input id="vePassword" class="input-dark w-full rounded-xl px-3.5 py-2 text-xs" placeholder="รหัสผ่านใหม่">
+        <label class="flex items-center gap-1.5 mt-1.5 text-[11px] text-slate-500"><input type="checkbox" id="veRemovePassword">เอารหัสผ่านออก (ใครก็เปิดดูได้)</label>
+      </div>
+      <button class="btn-cyan w-full py-2.5 rounded-xl font-semibold text-xs">บันทึกการแก้ไข</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal รายงานสคริปต์/ลิงก์/ผู้ใช้ -->
+<div id="reportModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-white border border-line w-full max-w-sm rounded-2xl p-5 shadow-2xl relative">
+    <button onclick="closeReportModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-900"><i class="fa-solid fa-xmark"></i></button>
+    <h2 class="text-base font-bold text-slate-900 mb-1"><i class="fa-solid fa-flag text-red-500 mr-1.5"></i>รายงาน</h2>
+    <p id="reportModalTarget" class="text-xs text-slate-500 mb-3"></p>
+    <form onsubmit="submitReport(event)" class="space-y-3">
+      <input type="hidden" id="rpType"><input type="hidden" id="rpTargetId"><input type="hidden" id="rpTargetLabel">
+      <textarea id="rpReason" required rows="3" class="input-dark w-full rounded-xl px-3.5 py-2 text-xs" placeholder="เหตุผลที่รายงาน..."></textarea>
+      <button class="btn-danger w-full py-2.5 rounded-xl font-semibold text-xs">ส่งรายงาน</button>
+    </form>
+  </div>
+</div>
+
+<div id="editRobloxModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-white border border-line w-full max-w-sm rounded-2xl p-5 shadow-2xl relative">
+    <button onclick="closeEditRobloxModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-900"><i class="fa-solid fa-xmark"></i></button>
+    <h2 class="text-base font-bold text-slate-900 mb-3"><i class="fa-solid fa-pen text-cyan mr-1.5"></i>แก้ไขเพลง</h2>
+    <form onsubmit="submitEditRoblox(event)" class="space-y-3">
+      <input type="hidden" id="erId">
+      <div><label class="block text-[11px] text-slate-500 mb-1">ชื่อเพลง</label><input id="erName" required class="input-dark w-full rounded-xl px-3.5 py-2 text-xs"></div>
+      <div><label class="block text-[11px] text-slate-500 mb-1">หมวดหมู่</label><select id="erGenre" class="input-dark w-full rounded-xl px-3.5 py-2 text-xs"></select></div>
+      <button class="btn-cyan w-full py-2.5 rounded-xl font-semibold text-xs">บันทึก</button>
+    </form>
+  </div>
+</div>
+
+<!-- หน้าจอโหลดเว็บเต็มจอ (ขึ้นก่อนเนื้อหาเว็บทุกครั้ง ไม่ใช่ป็อปอัพ ไม่มีปุ่มปิด) แก้ไขได้จาก Admin > หน้าโหลดเว็บ -->
+<div id="pageLoadingScreen">
+  <img id="plsBgImage" class="pls-bg-image" src="/images/loading-bg.webp">
+  <div class="pls-overlay"></div>
+  <div class="pls-center">
+    <div class="pls-loading">
+      <div class="pls-spinner"></div>
+      <p id="plsText" class="pls-text">กำลังโหลดหน้าเว็บ</p>
+    </div>
+  </div>
+</div>
+
+<!-- ป็อปอัพต้อนรับ/โปรโมชั่น (มีกรอบการ์ด+ปุ่มปิด) ขึ้นทีหลังหน้าโหลดเว็บ แก้ไขได้จาก Admin > ป็อปอัพต้อนรับ -->
+<div id="welcomePopup" class="hidden">
+  <div class="wp-card">
+    <button onclick="closeWelcomePopup()" class="wp-close"><i class="fa-solid fa-xmark text-xs"></i></button>
+    <img id="wpBgImage" class="wp-bg-image hidden" src="">
+    <div class="wp-body">
+      <div class="wp-eyebrow">Welcome</div>
+      <div id="wpTitle" class="wp-title"></div>
+      <div id="wpCodeWrap" class="wp-code-chip hidden">
+        <span id="wpCode" class="wp-code-text"></span>
+        <i class="fa-regular fa-copy wp-code-copy" onclick="copyWelcomeCode()" title="คัดลอกโค้ด"></i>
+      </div>
+      <p id="wpDesc" class="wp-desc"></p>
+      <div class="wp-cta-wrap">
+        <a id="wpCta" href="#" target="_blank" class="wp-cta">รับสิทธิ์เลย <i class="fa-solid fa-arrow-right text-[11px]"></i></a>
+      </div>
+    </div>
+    <div class="wp-foot">
+      <label class="wp-check-label"><input type="checkbox" id="wpHideCheck"> ไม่แสดงอีกเป็นเวลา 24 ชั่วโมง</label>
+    </div>
+  </div>
+</div>
+
+<!-- หน้านี้เป็นหน้าแอดมินโดยเฉพาะ (แยกไฟล์จริงจาก index.html เซิร์ฟเวอร์เช็คสิทธิ์ก่อนส่งไฟล์นี้ให้เสมอ) -->
+<!-- path จริงไม่มี # และไม่มี .html เช่น /admin หรือ /admin/settings — main.js อ่าน location.pathname เพื่อเลือกแท็บให้เอง -->
+<script src="/main.js" defer></script>
+</body>
+</html>

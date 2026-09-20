@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "functions": {
+    "api/**/*.js": {
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    { "source": "/api/quests/:id", "destination": "/api/quests/:id.js" },
+    { "source": "/api/quests", "destination": "/api/quests.js" },
+    { "source": "/api/events", "destination": "/api/events.js" },
+    { "source": "/api/health", "destination": "/api/health.js" },
+    { "source": "/", "destination": "/index.html" }
+  ]
+}

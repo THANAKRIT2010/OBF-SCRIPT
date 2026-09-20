@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flexozy API</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:linear-gradient(135deg,#f7fbff,#eaf3ff);color:#152238;min-height:100vh}
+main{max-width:900px;margin:auto;padding:70px 20px}.card{background:#fff;border:1px solid #dce9f7;border-radius:24px;padding:30px;box-shadow:0 15px 45px #326da51a}
+h1{margin:0 0 8px;font-size:38px}.sub{color:#61738b;margin-bottom:28px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.item{padding:18px;border-radius:17px;background:#f6faff;border:1px solid #e2edf8}.method{font-weight:800;color:#2877d8}code{background:#edf5ff;padding:3px 7px;border-radius:7px}
+pre{background:#101827;color:#dcecff;padding:18px;border-radius:16px;overflow:auto}.ok{display:inline-block;padding:7px 11px;border-radius:99px;background:#eaf7ef;color:#19733b;font-weight:700}
+</style>
+</head>
+<body>
+<main><div class="card">
+<h1>Flexozy API</h1>
+<div class="sub">Public API gateway for authorized Quest/provider integrations.</div>
+<span class="ok">API Ready</span>
+<h2>Endpoints</h2>
+<div class="grid">
+<div class="item"><div class="method">GET</div><code>/api/health</code><p>Health check</p></div>
+<div class="item"><div class="method">GET</div><code>/api/quests</code><p>List available quests</p></div>
+<div class="item"><div class="method">GET</div><code>/api/quests/:id</code><p>Get one quest</p></div>
+<div class="item"><div class="method">POST</div><code>/api/events</code><p>Dispatch an event to webhooks</p></div>
+</div>
+<h2>Authentication</h2>
+<pre>Authorization: Bearer YOUR_API_ADMIN_KEY</pre>
+<p>The provider adapter is intentionally separate. Put your authorized provider endpoint in <code>QUEST_PROVIDER_URL</code>.</p>
+</div></main>
+</body>
+</html>

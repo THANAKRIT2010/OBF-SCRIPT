@@ -1,1 +1,0 @@
-(()=>{const e=document.querySelectorAll('a[href^="#"]');e.forEach(e=>e.addEventListener("click",t=>{const r=e.getAttribute("href");r&&document.querySelector(r)?.scrollIntoView({behavior:"smooth"})}))})();

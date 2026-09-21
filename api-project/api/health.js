@@ -1,1 +1,0 @@
-export default async function(e,t){if(e.method!=="GET")return t.status(405).json({error:"method_not_allowed"});t.status(200).json({ok:true,service:"flexozy-api",timestamp:new Date().toISOString(),provider_configured:!!process.env.QUEST_PROVIDER_URL,auth_configured:!!process.env.API_ADMIN_KEY})}

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light"
+      style="--text:#1a1a1a; --accent:#7c3aed; --btn-text:#ffffff;">
+<head>
+<script>
+/* ── Theme sync (head_min) — อ่าน localStorage ก่อน paint เพื่อป้องกัน flash ── */
+window.__THEME_ASSETS_MIN__ = {
+  textLight: "#1a1a1a",
+  textDark:  "#ffffff",
+  bgEnabled: false,
+  bgLightDesk: "https:\/\/i.postimg.cc\/L60qXFBH\/Screenshot-20260813-184352-Chat-GPT.jpg",
+  bgLightMob:  "",
+  bgDarkDesk:  "https:\/\/i.postimg.cc\/ncvVg3MB\/file-00000000395482088b9a2f5358828b93.png",
+  bgDarkMob:   ""};
+(function(){
+  try {
+    var ut = localStorage.getItem('user_theme') || 'dark'; /* default: dark */
+    if (ut === 'dark' || ut === 'light') {
+      var h = document.documentElement;
+      var a = window.__THEME_ASSETS_MIN__;
+      h.setAttribute('data-theme', ut);
+      h.style.setProperty('--text', ut === 'dark' ? a.textDark : a.textLight);
+      if (a.bgEnabled) {
+        var bd = ut === 'dark' ? a.bgDarkDesk : a.bgLightDesk;
+        var bm = ut === 'dark' ? a.bgDarkMob  : a.bgLightMob;
+        if (bd) h.style.setProperty('--site-bg', "url('" + bd + "')");
+        else    h.style.removeProperty('--site-bg');
+        if (bm) h.style.setProperty('--site-bg-mobile', "url('" + bm + "')");
+        else    h.style.removeProperty('--site-bg-mobile');
+      }
+    }
+  } catch(e) {}
+})();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>วิธีสั่งซื้อ</title>
+<link rel="icon" type="image/png" href="https://i.postimg.cc/V6T0c39T/file-0000000032d881fa914380e92f152f16.png">
+<link rel="apple-touch-icon" href="https://i.postimg.cc/V6T0c39T/file-0000000032d881fa914380e92f152f16.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="description" content="ขั้นตอนการสั่งซื้อสินค้าและบริการ ง่ายๆ ไม่กี่ขั้นตอน">
+<meta name="keywords" content="Belzebub Shop | แหล่งรวมสินค้าคุณภาพ ครบครันทั้งสินค้าและบริการ คุ้มค่าในที่เดียว!">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://miay.online/how-to-buy">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Belzebub Shop">
+<meta property="og:title" content="วิธีสั่งซื้อ">
+<meta property="og:description" content="ขั้นตอนการสั่งซื้อสินค้าและบริการ ง่ายๆ ไม่กี่ขั้นตอน">
+<meta property="og:image" content="https://imgbs.com/uploads/79e99fa16c6f2878.png"><meta property="og:url" content="https://miay.online/how-to-buy">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="วิธีสั่งซื้อ">
+<meta name="twitter:description" content="ขั้นตอนการสั่งซื้อสินค้าและบริการ ง่ายๆ ไม่กี่ขั้นตอน">
+<meta name="twitter:image" content="https://imgbs.com/uploads/79e99fa16c6f2878.png"><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
+<link rel="stylesheet" href="/assets/css/style.css?v=1789271953">
+<link rel="stylesheet" href="/assets/css/auth.css?v=1786935155">
+<link rel="preload" href="https://unpkg.com/aos@2.3.1/dist/aos.css" as="style" onload="this.rel='stylesheet'">
+<noscript><link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"></noscript>
+<style>
+/* Preloader Styles */
+#preloader {
+  font-family: 'Prompt', sans-serif,system-ui,sans-serif;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg, #ffffff);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  z-index: 999999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+#preloader.has-bg {
+  background-image: var(--site-bg);
+}
+#preloader::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.24);
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+#preloader.has-bg::before { opacity: 1; }
+#preloader .preloader__content { position: relative; z-index: 1; }
+#preloader.has-bg .preloader__text { color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
+@media (max-width: 767px) {
+  #preloader.has-bg {
+    background-image: var(--site-bg-mobile, var(--site-bg));
+    background-position: center top;
+  }
+}
+.preloader__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.preloader__logo-wrapper {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.preloader__glow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--accent, #caa14a);
+  opacity: 0.15;
+  filter: blur(10px);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+.preloader__ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 3px solid rgba(202, 161, 74, 0.08);
+  border-top: 3px solid var(--accent, #caa14a);
+  border-radius: 50%;
+  animation: spin 1.2s cubic-bezier(0.5, 0.2, 0.2, 0.8) infinite;
+}
+.preloader__ring-inner {
+  position: absolute;
+  width: 76%;
+  height: 76%;
+  border: 2px solid rgba(202, 161, 74, 0.04);
+  border-bottom: 2px solid var(--accent, #caa14a);
+  border-radius: 50%;
+  animation: spin 2s linear infinite reverse;
+}
+.preloader__icon {
+  z-index: 2;
+  color: var(--accent, #caa14a);
+  animation: float-icon 2s ease-in-out infinite;
+}
+.preloader__logo-img {
+  display: block;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 12px;
+}
+.preloader__text {
+  font-family: 'Prompt', sans-serif;;
+  color: var(--text, #1a1a1a);
+  font-size: 15.5px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  opacity: 0.8;
+  animation: pulse-text 1.5s ease-in-out infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes pulse-glow {
+  0%, 100% { transform: scale(0.9); opacity: 0.1; }
+  50% { transform: scale(1.1); opacity: 0.25; }
+}
+@keyframes float-icon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes pulse-text {
+  0%, 100% { opacity: 0.5; transform: scale(0.97); }
+  50% { opacity: 1; transform: scale(1.03); }
+}
+/* Fix transitions and preloader flashing */
+body {
+  animation: none !important;
+}
+body.page-leaving {
+  opacity: 1 !important;
+}
+body.page-leaving > *:not(#preloader) {
+  opacity: 0 !important;
+  transition: opacity 0.22s ease !important;
+  pointer-events: none !important;
+}
+</style>
+</head>
+<body>
+<!-- Preloader -->
+<div id="preloader" class="">
+  <div class="preloader__content">
+    <div class="preloader__logo-wrapper">
+      <div class="preloader__glow"></div>
+      <div class="preloader__ring"></div>
+      <div class="preloader__ring-inner"></div>
+      <div class="preloader__icon">
+                  <img src="https://i.postimg.cc/V6T0c39T/file-0000000032d881fa914380e92f152f16.png" alt="Belzebub Shop" class="preloader__logo-img">
+              </div>
+    </div>
+    <div class="preloader__text">กำลังเตรียมข้อมูล...</div>
+  </div>
+</div>
+<nav class="nav">
+    <a class="nav__burger" href="/" aria-label="กลับหน้าแรก" style="display:flex!important;"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 10.5 12 5l7 5.5V20H5z" fill="currentColor" fill-opacity=".18"/><path d="M4 11l8-6 8 6M6 10v10h12V10"/><path d="M10 20v-5h4v5"/></svg></a>
+    <div class="nav__brand">Belzebub Shop</div>
+    <div class="nav__spacer"></div>
+            <a class="nav__login nav-auth-btn" href="/user/login"><svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="currentColor" fill-opacity=".18"/><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3.6 3.6-6 8-6s8 2.4 8 6"/></svg> เข้าสู่ระบบ</a>
+    </nav>
+
+
+<!-- ── Bottom Navigation Bar (mobile only) ── -->
+<!-- overlay ปิด popup -->
+<div class="bnav-overlay" id="bnavOverlay" onclick="bnavCloseMore()"></div>
+
+<!-- popup เพิ่มเติม -->
+<style>
+.bnav-more-popup {
+    min-width: 300px;
+    padding: 14px;
+}
+.bnav-popup-header {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted, #aaa);
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    padding: 2px 6px 10px;
+}
+.bnav-popup-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 18px;
+    text-decoration: none;
+    color: var(--text, #1a1a1a);
+    font-weight: 700;
+    font-size: 15px;
+    transition: background .15s, transform .15s;
+    position: relative;
+    overflow: hidden;
+}
+[data-theme="dark"] .bnav-popup-card { color: #f0f0f0; }
+.bnav-popup-card:active { transform: scale(.97); }
+.bnav-popup-card:hover, .bnav-popup-card.active {
+    background: rgba(0,0,0,.05);
+}
+[data-theme="dark"] .bnav-popup-card:hover,
+[data-theme="dark"] .bnav-popup-card.active {
+    background: rgba(255,255,255,.07);
+}
+.bnav-popup-card.active .bnav-popup-card__name {
+    color: var(--accent, #7c3aed);
+}
+/* icon container */
+.bnav-popup-card__ico {
+    width: 52px; height: 52px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+}
+/* text block */
+.bnav-popup-card__body { flex: 1; min-width: 0; }
+.bnav-popup-card__name {
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 3px;
+}
+.bnav-popup-card__sub {
+    font-size: 11.5px;
+    color: var(--muted, #aaa);
+    font-weight: 500;
+}
+.bnav-popup-card__arrow {
+    color: var(--muted, #ccc);
+    flex-shrink: 0;
+    transition: transform .18s;
+}
+.bnav-popup-card:hover .bnav-popup-card__arrow,
+.bnav-popup-card.active .bnav-popup-card__arrow {
+    transform: translateX(3px);
+    color: var(--accent, #7c3aed);
+}
+/* divider */
+.bnav-popup-divider {
+    height: 1px;
+    background: var(--line, #ebebeb);
+    margin: 6px 10px;
+}
+[data-theme="dark"] .bnav-popup-divider { background: rgba(255,255,255,.08); }
+
+/* — Social: orange gradient icon — */
+.ico-social {
+    background: linear-gradient(135deg, #ff7d1a 0%, #f9a825 100%);
+    box-shadow: 0 6px 18px rgba(249,115,22,.35);
+}
+/* glow ring on active */
+.bnav-popup-card.active .ico-social {
+    box-shadow: 0 6px 22px rgba(249,115,22,.5), 0 0 0 3px rgba(249,115,22,.18);
+}
+
+/* — Discord: blurple gradient icon — */
+.ico-discord {
+    background: linear-gradient(135deg, #5865f2 0%, #7289da 100%);
+    box-shadow: 0 6px 18px rgba(88,101,242,.35);
+}
+.bnav-popup-card.active .ico-discord {
+    box-shadow: 0 6px 22px rgba(88,101,242,.5), 0 0 0 3px rgba(88,101,242,.18);
+}
+
+/* pulse dot badge (online indicator) */
+.bnav-popup-badge {
+    position: absolute;
+    top: -3px; right: -3px;
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    background: #22c55e;
+    border: 2.5px solid var(--card, #fff);
+}
+[data-theme="dark"] .bnav-popup-badge { border-color: #2a2a3e; }
+@keyframes bnavPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,.6); }
+    50%       { box-shadow: 0 0 0 5px rgba(34,197,94,0); }
+}
+.bnav-popup-badge { animation: bnavPulse 2s infinite; }
+</style>
+
+<div class="bnav-more-popup" id="bnavMorePopup">
+    <div class="bnav-popup-header">บริการเสริม</div>
+
+    <!-- ปั้มโซเชียล -->
+    <a class="bnav-popup-card"
+       href="/social-pump">
+        <span class="bnav-popup-card__ico ico-social">
+            <!-- Flame / boost icon -->
+            <svg width="27" height="27" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C12.5 5.5 10 7 9.5 10C9 13 11 14.5 12 14.5C13.5 14.5 14 13 13.5 10C16 12 17 15 15 18C13.5 20.5 10 21 7.5 19C5 17 4.5 13.5 6 11C7 9.5 9 9 9.5 7C10 5.5 10.5 3.5 12 2Z" fill="white" opacity="0.9"/>
+                <path d="M13.5 10C14.5 12 16.5 13 16 16C15.5 18.5 13 20 10 19.5" stroke="white" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.6"/>
+                <circle cx="12" cy="18" r="2.2" fill="white" opacity="0.3"/>
+            </svg>
+        </span>
+        <div class="bnav-popup-card__body">
+            <div class="bnav-popup-card__name">ปั้มโซเชียล</div>
+            <div class="bnav-popup-card__sub">ไลก์ · ผู้ติดตาม · วิว</div>
+        </div>
+        <svg class="bnav-popup-card__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+
+    <div class="bnav-popup-divider"></div>
+
+    <!-- ปั้มสมาชิก Discord -->
+    <a class="bnav-popup-card"
+       href="/discord-member">
+        <span class="bnav-popup-card__ico ico-discord" style="position:relative">
+            <!-- Discord official logo path -->
+            <svg width="28" height="22" viewBox="0 0 127.14 96.36" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"/>
+            </svg>
+            <span class="bnav-popup-badge"></span>
+        </span>
+        <div class="bnav-popup-card__body">
+            <div class="bnav-popup-card__name">ปั้มสมาชิก Discord</div>
+            <div class="bnav-popup-card__sub">ออนไลน์ · ออฟไลน์ · รีแอค</div>
+        </div>
+        <svg class="bnav-popup-card__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </a>
+</div>
+
+<nav class="bnav" aria-label="เมนูด้านล่าง">
+    <a class="bnav__item"
+       href="/">
+        <span class="bnav__icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 10.5 12 5l7 5.5V20H5z" fill="currentColor" fill-opacity=".18"/><path d="M4 11l8-6 8 6M6 10v10h12V10"/><path d="M10 20v-5h4v5"/></svg></span>
+        <span class="bnav__label">หน้าหลัก</span>
+    </a>
+    <a class="bnav__item"
+       href="/categories">
+        <span class="bnav__icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21 4 16.5v-9z" fill="currentColor" fill-opacity=".15"/><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg></span>
+        <span class="bnav__label">หมวดหมู่</span>
+    </a>
+    <!-- ปุ่มกลาง เพิ่มเติม -->
+    <button type="button" class="bnav__item"
+            id="bnavMoreBtn" onclick="bnavToggleMore()" aria-label="เพิ่มเติม">
+        <span class="bnav__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="5" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="19" r="1.4" fill="currentColor"/></svg>
+        </span>
+        <span class="bnav__label">เพิ่มเติม</span>
+    </button>
+    <a class="bnav__item"
+       href="/user/topup">
+        <span class="bnav__icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="3" fill="currentColor" fill-opacity=".18"/><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18"/><circle cx="17" cy="14" r="1.3" fill="currentColor"/></svg></span>
+        <span class="bnav__label">เติมเงิน</span>
+    </a>
+        <a class="bnav__item"
+       href="/user/login">
+        <span class="bnav__icon"><svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="currentColor" fill-opacity=".18"/><circle cx="12" cy="8" r="4"/><path d="M4 20c0-3.6 3.6-6 8-6s8 2.4 8 6"/></svg></span>
+        <span class="bnav__label">เข้าสู่ระบบ</span>
+    </a>
+    </nav>
+<script>
+function bnavToggleMore(){
+    var p=document.getElementById('bnavMorePopup');
+    var o=document.getElementById('bnavOverlay');
+    var open=p.classList.toggle('open');
+    o.classList.toggle('open',open);
+}
+function bnavCloseMore(){
+    document.getElementById('bnavMorePopup').classList.remove('open');
+    document.getElementById('bnavOverlay').classList.remove('open');
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')bnavCloseMore();});
+/* ปิด popup ทันทีตอนออกจากหน้า (กดลิงก์ / back / forward) */
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')bnavCloseMore();});
+window.addEventListener('pageshow',function(e){if(e.persisted)bnavCloseMore();});
+window.addEventListener('pagehide',function(){bnavCloseMore();});
+</script>
+<div class="doc-wrap">
+    <div class="page-head">
+        <div class="page-head__ic"><svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.6" fill="currentColor"/><circle cx="18" cy="20" r="1.6" fill="currentColor"/><path d="M3 4h2.2l2.3 11h11l2-8H6.5"/></svg></div>
+        <div>
+            <h1 class="page-head__title">วิธีสั่งซื้อ</h1>
+            <div class="page-head__sub">ขั้นตอนการสั่งซื้อสินค้าและบริการ ง่ายๆ ไม่กี่นาที</div>
+        </div>
+    </div>
+
+    <div class="doc-card">
+        <ol class="doc-steps">
+            <li>
+                <span class="doc-steps__num">1</span>
+                <div class="doc-steps__body">
+                    <b>เลือกสินค้าที่ต้องการ</b>
+                    <span>เข้าไปที่หน้าร้านค้าทั้งหมด เลือกสินค้าหรือบริการที่ต้องการสั่งซื้อ</span>
+                </div>
+            </li>
+            <li>
+                <span class="doc-steps__num">2</span>
+                <div class="doc-steps__body">
+                    <b>เข้าสู่ระบบ</b>
+                    <span>ล็อกอินด้วยบัญชี Discord ของคุณ หากยังไม่มีบัญชีระบบจะสร้างให้อัตโนมัติ</span>
+                </div>
+            </li>
+            <li>
+                <span class="doc-steps__num">3</span>
+                <div class="doc-steps__body">
+                    <b>เติมเงินเข้ากระเป๋า</b>
+                    <span>เติมเงินผ่านช่องทางที่รองรับ เช่น TrueMoney Wallet หรือโอนผ่านธนาคาร</span>
+                </div>
+            </li>
+            <li>
+                <span class="doc-steps__num">4</span>
+                <div class="doc-steps__body">
+                    <b>กดสั่งซื้อ</b>
+                    <span>ยืนยันการสั่งซื้อ ระบบจะตัดยอดเงินจากกระเป๋าของคุณทันที</span>
+                </div>
+            </li>
+            <li>
+                <span class="doc-steps__num">5</span>
+                <div class="doc-steps__body">
+                    <b>รับสินค้าอัตโนมัติ</b>
+                    <span>ระบบจะส่งสินค้าให้ทันทีหลังชำระเงินสำเร็จ ตรวจสอบได้ที่หน้าประวัติการสั่งซื้อ</span>
+                </div>
+            </li>
+        </ol>
+    </div>
+
+    <div class="doc-card">
+        <div class="doc-section">
+            <h2><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="11" r="8" fill="currentColor" fill-opacity=".15"/><path d="M4 13v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="3.5" height="6" rx="1.6"/><rect x="17.5" y="13" width="3.5" height="6" rx="1.6"/></svg> ติดปัญหาระหว่างสั่งซื้อ?</h2>
+            <p>หากพบปัญหาในการสั่งซื้อหรือชำระเงิน สามารถติดต่อทีมงานผ่านช่องทางด้านล่างของเว็บไซต์ได้ตลอดเวลา</p>
+        </div>
+    </div>
+</div>
+<footer class="site-foot-new">
+  <div class="foot-inner">
+    <div class="foot-col foot-col--brand">
+      <div class="foot-logo">
+                  <img src="https://i.postimg.cc/V6T0c39T/file-0000000032d881fa914380e92f152f16.png" alt="Belzebub Shop">
+                <span>Belzebub Shop</span>
+      </div>
+      <p class="foot-desc">Belzebub Shop | แหล่งรวมสินค้าคุณภาพ
+ครบครันทั้งสินค้าและบริการ คุ้มค่าในที่เดียว!</p>
+            <div class="foot-socials">
+                  <a href="https://discord.gg/zyd4eCtcR6" class="foot-social" target="_blank" rel="noopener" aria-label="social">
+            <svg viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15zM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.04 12.69-11.43 12.69z"/></svg>          </a>
+              </div>
+          </div>
+    <div class="foot-col">
+      <h3 class="foot-col__title">เมนูด่วน</h3>
+      <ul class="foot-links">
+        <li><a href="/">หน้าแรก</a></li>
+        <li><a href="/#products">ร้านค้าทั้งหมด</a></li>
+        <li><a href="/how-to-buy">วิธีสั่งซื้อ</a></li>
+        <li><a href="/#contact">ติดต่อเรา</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <h3 class="foot-col__title">นโยบาย</h3>
+      <ul class="foot-links">
+        <li><a href="/terms">ข้อตกลงและเงื่อนไข</a></li>
+        <li><a href="/privacy">นโยบายความเป็นส่วนตัว</a></li>
+        <li><a href="/refund-policy">นโยบายการคืนเงิน</a></li>
+      </ul>
+    </div>
+    <div class="foot-col foot-col--contact" id="contact">
+      <h3 class="foot-col__title">ช่องทางการติดต่อ</h3>
+            <a href="https://discord.gg/zyd4eCtcR6" class="foot-contact-item" target="_blank" rel="noopener"
+         style="--pc:#5865F2">
+        <span class="foot-contact-item__icon">
+                      <svg viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15zM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.04 12.69-11.43 12.69z"/></svg>                  </span>
+        <span class="foot-contact-item__body">
+          <span class="foot-contact-item__label">Discord</span>
+          <span class="foot-contact-item__val">แจ้งปัญหาต่างๆ เติมเงินไม่เข้าหรืออื่นๆ</span>
+        </span>
+        <span class="foot-contact-item__arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;opacity:.45"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        </span>
+      </a>
+          </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 <b>Belzebub Shop</b> · All Rights Reserved.</span>
+    <a href="https://discord.gg/h84VcxbjdB" target="_blank" rel="noopener" class="foot-bottom__report">
+      <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4l11 4V6z" fill="currentColor" fill-opacity=".15"/><path d="M4 10a2 2 0 0 1 2-2h3l7-3v14l-7-3H6a2 2 0 0 1-2-2z"/><path d="M9 16v3h2"/></svg> รายงานปัญหา
+    </a>
+  </div>
+</footer>
+<script src="/assets/js/app.js" defer></script>
+<script src="/assets/js/nav-progress.js" defer></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
+<script>
+  window.addEventListener('load', function() {
+    // Hide preloader (keep in DOM for reuse during transitions)
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+      preloader.style.opacity = '0';
+      preloader.style.visibility = 'hidden';
+    }
+
+    AOS.init({
+      duration: 800,
+      // once: true,
+      // offset: 50
+    });
+  });
+</script>
+<script>window.__FX__={"type":"none"};</script>
+<script src="/assets/js/effects.js" defer></script>
+</body></html>

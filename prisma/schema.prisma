@@ -1,0 +1,83 @@
+// Flexozy database schema
+// Run `npx prisma db push` after setting DATABASE_URL to create these tables.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Works with Vercel Postgres, Neon, Supabase, etc.
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  discordId     String   @unique
+  username      String
+  discriminator String?
+  avatar        String? // full CDN url
+  banner        String? // full CDN url
+  email         String?
+  isAdmin       Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  orders        Order[]
+}
+
+model Product {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String
+  description  String   @db.Text
+  priceCents   Int // price in smallest currency unit (e.g. satang/cents)
+  currency     String   @default("THB")
+  imageUrl     String?
+  // deliveryType: "key" (generates a license key), "file" (download link/upload), "link" (external link)
+  deliveryType String   @default("key")
+  fileUrl      String? // used when deliveryType = "file" or "link"
+  keyDurationDays Int?  // used when deliveryType = "key" — null/0 = lifetime
+  stock        Int      @default(-1) // -1 = unlimited
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  orders       Order[]
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  productId   String
+  product     Product     @relation(fields: [productId], references: [id])
+  status      OrderStatus @default(PENDING)
+  priceCents  Int
+  currency    String
+  createdAt   DateTime    @default(now())
+  licenseKey  LicenseKey?
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+model LicenseKey {
+  id         String    @id @default(cuid())
+  code       String    @unique // e.g. FLEXOZY-XXXX-XXXX-XXXX
+  orderId    String    @unique
+  order      Order     @relation(fields: [orderId], references: [id])
+  hwid       String? // optional hardware-lock, set on first use
+  maxHwids   Int       @default(1)
+  status     KeyStatus @default(ACTIVE)
+  expiresAt  DateTime? // null = lifetime
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
+}
+
+enum KeyStatus {
+  ACTIVE
+  REVOKED
+  EXPIRED
+}

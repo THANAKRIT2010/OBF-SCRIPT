@@ -1,0 +1,13 @@
+{
+  "name": "flexozy-verify-follow",
+  "version": "1.0.0",
+  "private": true,
+  "description": "OCR-based YouTube follow-status verification (Vercel serverless) for flexozy.online",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@vercel/kv": "^1.0.1",
+    "formidable": "^3.5.1"
+  }
+}

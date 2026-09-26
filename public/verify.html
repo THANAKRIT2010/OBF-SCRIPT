@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ตรวจสอบการติดตาม — Flexozy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12151A;
+    --surface:#1B1F26;
+    --surface-2:#232833;
+    --text:#EDEFF2;
+    --muted:#8B93A1;
+    --pass:#4DE8C9;
+    --fail:#FF6B5C;
+    --border:#2C313C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Sans Thai', sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 16px;
+  }
+  .card{
+    width:100%;
+    max-width:480px;
+  }
+  h1{
+    font-size:26px;
+    font-weight:700;
+    line-height:1.35;
+    margin:0 0 6px;
+  }
+  p.lead{
+    color:var(--muted);
+    font-size:15px;
+    line-height:1.6;
+    margin:0 0 28px;
+  }
+  label.field-label{
+    display:block;
+    font-size:13px;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  input[type=text]{
+    width:100%;
+    background:var(--surface);
+    border:1px solid var(--border);
+    color:var(--text);
+    font-family:inherit;
+    font-size:15px;
+    padding:11px 13px;
+    border-radius:10px;
+    margin-bottom:20px;
+  }
+  input[type=text]:focus{outline:2px solid var(--pass); outline-offset:1px;}
+
+  .dropzone{
+    border:1.5px dashed var(--border);
+    border-radius:16px;
+    background:var(--surface);
+    padding:36px 20px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .dropzone:hover, .dropzone.drag{
+    border-color:var(--pass);
+    background:var(--surface-2);
+  }
+  .dropzone svg{margin-bottom:10px; opacity:.7;}
+  .dropzone .dz-title{font-size:15px; font-weight:600; margin-bottom:4px;}
+  .dropzone .dz-sub{font-size:13px; color:var(--muted);}
+  #fileInput{display:none;}
+
+  .preview{
+    display:none;
+    margin-top:16px;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid var(--border);
+  }
+  .preview img{display:block; width:100%; max-height:280px; object-fit:cover;}
+
+  button#submitBtn{
+    width:100%;
+    margin-top:20px;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:var(--text);
+    color:var(--bg);
+    font-family:inherit;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:opacity .15s ease, transform .1s ease;
+  }
+  button#submitBtn:disabled{opacity:.45; cursor:not-allowed;}
+  button#submitBtn:not(:disabled):active{transform:scale(.98);}
+
+  .result{
+    display:none;
+    margin-top:22px;
+    padding:18px 18px;
+    border-radius:14px;
+    border:1px solid var(--border);
+    background:var(--surface);
+  }
+  .result.show{
+    display:block;
+    animation:reveal .35s ease;
+  }
+  @keyframes reveal{
+    from{opacity:0; transform:translateY(6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .result-status{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:17px;
+    font-weight:700;
+    margin-bottom:10px;
+  }
+  .dot{width:10px; height:10px; border-radius:50%; flex-shrink:0;}
+  .dot.pass{background:var(--pass); box-shadow:0 0 0 4px rgba(77,232,201,.15);}
+  .dot.fail{background:var(--fail); box-shadow:0 0 0 4px rgba(255,107,92,.15);}
+  .result-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:14px;
+    color:var(--muted);
+    padding:7px 0;
+    border-top:1px solid var(--border);
+  }
+  .result-row:first-of-type{border-top:none;}
+  .result-row span.v{color:var(--text); font-weight:600;}
+
+  .error{
+    display:none;
+    margin-top:18px;
+    padding:14px 16px;
+    border-radius:12px;
+    background:rgba(255,107,92,.1);
+    border:1px solid rgba(255,107,92,.3);
+    color:var(--fail);
+    font-size:14px;
+  }
+  .error.show{display:block;}
+
+  @media (prefers-reduced-motion: reduce){
+    .result.show{animation:none;}
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>ตรวจสอบสถานะการติดตาม</h1>
+    <p class="lead">อัปโหลดภาพหน้าจอช่อง YouTube ระบบจะอ่านข้อความในภาพและบอกว่ากดติดตามแล้วหรือยัง</p>
+
+    <label class="field-label" for="handleInput">Handle ของช่องที่ต้องติดตาม (ไม่ใส่ @)</label>
+    <input type="text" id="handleInput" placeholder="เช่น Bafucknakubbro">
+
+    <div class="dropzone" id="dropzone">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8B93A1" stroke-width="1.6"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+      <div class="dz-title">ลากภาพมาวาง หรือแตะเพื่อเลือกไฟล์</div>
+      <div class="dz-sub">รองรับ PNG / JPG ขนาดไม่เกิน 8MB</div>
+      <input type="file" id="fileInput" accept="image/*">
+    </div>
+
+    <div class="preview" id="preview"><img id="previewImg" alt="ภาพที่เลือก"></div>
+
+    <button id="submitBtn" disabled>ตรวจสอบภาพ</button>
+
+    <div class="error" id="errorBox"></div>
+
+    <div class="result" id="result">
+      <div class="result-status" id="resultStatus"></div>
+      <div class="result-row"><span>ช่องตรงกับที่ระบุ</span><span class="v" id="rowChannel">—</span></div>
+      <div class="result-row"><span>เคยใช้ภาพนี้มาก่อน</span><span class="v" id="rowReused">—</span></div>
+    </div>
+  </div>
+
+<script>
+  const ENDPOINT = "/api/v1/youtube";
+
+  const dropzone = document.getElementById("dropzone");
+  const fileInput = document.getElementById("fileInput");
+  const preview = document.getElementById("preview");
+  const previewImg = document.getElementById("previewImg");
+  const submitBtn = document.getElementById("submitBtn");
+  const handleInput = document.getElementById("handleInput");
+  const resultBox = document.getElementById("result");
+  const resultStatus = document.getElementById("resultStatus");
+  const rowChannel = document.getElementById("rowChannel");
+  const rowReused = document.getElementById("rowReused");
+  const errorBox = document.getElementById("errorBox");
+
+  let selectedFile = null;
+
+  dropzone.addEventListener("click", () => fileInput.click());
+  dropzone.addEventListener("dragover", e => { e.preventDefault(); dropzone.classList.add("drag"); });
+  dropzone.addEventListener("dragleave", () => dropzone.classList.remove("drag"));
+  dropzone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropzone.classList.remove("drag");
+    if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files[0]) setFile(fileInput.files[0]);
+  });
+
+  function setFile(file){
+    selectedFile = file;
+    previewImg.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+    submitBtn.disabled = false;
+    resultBox.classList.remove("show");
+    errorBox.classList.remove("show");
+  }
+
+  submitBtn.addEventListener("click", async () => {
+    if (!selectedFile) return;
+    submitBtn.disabled = true;
+    submitBtn.textContent = "กำลังตรวจสอบ...";
+    errorBox.classList.remove("show");
+    resultBox.classList.remove("show");
+
+    const formData = new FormData();
+    formData.append("image", selectedFile);
+    if (handleInput.value.trim()) formData.append("channelHandle", handleInput.value.trim());
+
+    try {
+      const resp = await fetch(ENDPOINT, { method: "POST", body: formData });
+      const data = await resp.json();
+      if (!resp.ok || !data.ok) throw new Error(data.error || "ตรวจสอบไม่สำเร็จ");
+
+      const dotClass = data.following ? "pass" : "fail";
+      resultStatus.innerHTML = `<span class="dot ${dotClass}"></span>${data.following ? "ติดตามแล้ว" : "ยังไม่ได้ติดตาม"}`;
+
+      rowChannel.textContent = data.channelMatch === null ? "ไม่ได้ระบุ" : (data.channelMatch ? "ตรงกัน" : "ไม่ตรงกัน");
+      rowReused.textContent = data.reused ? "เคยใช้แล้ว" : "ยังไม่เคยใช้";
+
+      resultBox.classList.add("show");
+    } catch (err) {
+      errorBox.textContent = err.message;
+      errorBox.classList.add("show");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "ตรวจสอบภาพ";
+    }
+  });
+</script>
+</body>
+</html>

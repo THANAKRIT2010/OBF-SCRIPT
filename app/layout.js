@@ -1,1 +1,0 @@
-export const metadata={title:"Flexozy",description:"Flexozy"};export default function Layout({children}){return <html lang="th"><body>{children}</body></html>}
